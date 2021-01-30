@@ -1,0 +1,38 @@
+# Workdir for ansible roles
+work_dir: /opt/lab
+
+# Redhat Subsription Manager Credentials
+rhsm_user: "{{ vault_rhsm_user }}"
+rhsm_password: "{{ vault_rhsm_password }}"
+
+# Admin password for foreman
+foreman_admin_password: "{{ vault_foreman_admin_password }}"
+
+# Authentication for connections from the public internet
+google_oauth_client_id: "{{ vault_google_oauth_client_id }}"
+google_oauth_clientsecret: "{{ vault_google_oauth_clientsecret }}"
+google_oauth_secret: "{{ vault_google_oauth_secret }}"
+google_oauth_allowlist: "{{ vault_google_oauth_allowlist }}"
+public_domain: "{{ vault_public_domain }}"
+public_port: "{{ vault_public_port }}"
+
+# Token for Cloudflares API
+ddns_domain:  public.com
+ddns_query_host: hello.public.com
+ddns_hostnames: "@"
+cloudflare_token: "{{ vault_cloudflare_token }}"
+
+# Example NFS Mounts
+nfs_mounts: [ ]
+  #- {server: "nfs.example.local", name: "mountpoint_name", path: "path/on/server"}
+
+vdo_devices: [ ]
+  #- { vdo_name: "vdo", dev_name: "/dev/sdb", mountpoint: "/mount/path", vdo_lv_size: "10G" }
+
+# Private Key used with ansible
+ansible_public_key: "{{ vault_ansible_public_key }}"
+ansible_private_key: "{{ vault_ansible_public_key }}"
+
+# Private Key for SSH access from public internet
+access_public_key: "{{ vault_access_public_key }}"
+access_private_key: "{{ vault_access_private_key }}"

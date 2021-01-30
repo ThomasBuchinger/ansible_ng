@@ -1,0 +1,8 @@
+---
+cockpit_additional_packages:
+      #- cockpit-session-recording
+      - cockpit-storaged
+      - cockpit-pcp
+      - cockpit-dashboard
+cockpit_core_packages:
+      - cockpit

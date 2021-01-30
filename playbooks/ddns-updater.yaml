@@ -1,0 +1,11 @@
+- name: "Install DDNS Updater script"
+  hosts: ddns_updater
+  vars:
+    ddns_client_domain: "{{ ddns_domain }}"
+    ddns_client_hostnames: "{{ ddns_hostnames }}"
+    ddns_client_query: "{{ ddns_query_host }}"
+    ddns_client_provider: cloudflare
+    ddns_client_authtype: token
+    ddns_client_token: "{{ cloudflare_token }}"
+  roles:
+    - app_ddns_client

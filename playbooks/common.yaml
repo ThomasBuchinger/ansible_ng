@@ -1,0 +1,20 @@
+- name: Common config for all nodes
+  hosts: all
+  roles:
+    - oasis_roles.system.chrony
+  tasks:
+    - include_role:
+        name: config_nfs_client
+      vars:
+        nfs_server: "{{ item.server }}"
+        nfs_share_name: "{{ item.name }}"
+        nfs_path: "{{ item.path }}"
+        nfs_mount_opts: "{{ item.opts }}"
+      loop: "{{ nfs_mounts }}"
+    - include_role:
+        name: comp_vdo
+      vars:
+        vdo_name: "{{ item.vdo_name }}"
+        dev_name: "{{ item.dev_name }}"
+        vdo_lv_size: "{{ item.vdo_size }}"
+      loop: "{{ vdo_devices }}"

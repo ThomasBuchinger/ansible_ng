@@ -1,0 +1,36 @@
+---
+
+- name: Syncthing / Download release
+  github_download:
+    repo: syncthing/syncthing
+    pattern: 'syncthing-linux-amd64-.*\.tar\.gz'
+    dest: "/tmp/"
+  register: download
+
+- name: Syncthing / Unpack
+  ansible.builtin.unarchive:
+    remote_src: yes
+    src: "{{ download.path }}"
+    dest: "/tmp/syncthing/"
+- name: Syncthing / Copy executeable
+  ansible.builtin.copy:
+    remote_src: yes
+    src: /tmp/syncthing/syncthing
+    dest: /usr/bin/
+  notify: restart_syncthing
+- name: Syncthing / Copy systemd service
+  ansible.builtin.copy:
+    remote_src: yes
+    src: '/tmp/syncthing/etc/linux-systemd/system/syncthing@.service' 
+    dest: /etc/systemd/system/
+  notify: restart_syncthing
+- name: Syncthing / Start Service
+  ansible.builtin.systemd:
+    name: syncthing@synching.service
+    enabled: yes
+    state: started
+- name: Syncthing / Download bash status monitor
+  get_url:
+    url: https://raw.githubusercontent.com/serl/syncthing-quick-status/master/syncthing-quick-status.sh
+    dest: /usr/bin/syncthing-quick-status.sh
+    mode: 0755

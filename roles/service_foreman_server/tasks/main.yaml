@@ -1,0 +1,49 @@
+---
+- import_tasks: check.yaml
+  tags:
+    - service_foreman_server
+    - service_foreman_server:check
+- import_tasks: prepare_host.yaml
+  become: yes
+  tags:
+    - service_foreman_server
+    - service_foreman_server:prepare
+
+- import_tasks: configure_foreman_server.yaml
+  become: yes
+  tags:
+    - service_foreman_server
+    - service_foreman_server:server
+
+- import_tasks: configure_foreman_proxy-plugins.yaml
+  become: yes
+  tags:
+    - service_foreman_server
+    - service_foreman_server:proxy
+
+- include_tasks: configure_compute_vmware.yaml
+  loop: "{{ foreman_compute }}"
+  loop_control:
+    loop_var: "vmware_compute"
+  when: 
+    - vmware_compute.type == "vmware"
+    - foreman_skip_compute_vmware != true
+  tags:
+    - service_foreman_server
+    - service_foreman_server:vmware
+
+- include_tasks: configure_compute_kvm.yaml
+  loop: "{{ foreman_compute }}"
+  loop_control:
+    loop_var: "kvm_compute"
+  when: 
+    - kvm_compute.type == "kvm"
+    - foreman_skip_compute_kvm != true
+  tags:
+    - service_foreman_server
+    - service_foreman_server:kvm
+
+- import_tasks: configure_resources.yaml
+
+#- import_tasks: configure_ansible.yaml
+#- import_tasks: fix_tftpboot.yaml

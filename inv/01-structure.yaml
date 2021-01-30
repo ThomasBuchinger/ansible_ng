@@ -1,0 +1,20 @@
+---
+all:
+  vars: {}
+
+bastions: {}
+foreman_servers: {}
+kube_nodes:
+  children:
+    kube_seed: {}
+    kube_masters: {}
+    kube_ingress: {}
+kvm_hypervisors: {}
+gluster_nodes:
+  children:
+    kube_gluster_config:
+dns_servers: {}
+terraform_nodes: {}
+ddns_updater: {}
+syncthing: {}
+

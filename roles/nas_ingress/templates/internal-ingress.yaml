@@ -1,0 +1,58 @@
+
+#---
+#apiVersion: networking.k8s.io/v1
+#kind: Ingress
+#metadata:
+#  name: traefik-ingress
+#  namespace: ingress-controller
+#  annotations:
+#    traefik.ingress.kubernetes.io/router.middlewares: nas-strip@kubernetescrd
+#spec:
+#  rules:
+#  - host: access.{{ ansible_default_ipv4.address }}.nip.io
+#    http:
+#      paths:
+#      - path: /
+#        pathType: Prefix
+#        backend:
+#          service:
+#            name: traefik-ui
+#            port:
+#              number: 8100
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: okd-ingress
+  namespace: okd-console
+  #annotations:
+  #  nginx.ingress.kubernetes.io/proxy-redirect-from: /console
+  #  nginx.ingress.kubernetes.io/proxy-redirect-to: /
+  #  nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  rules:
+  - host: console.{{ ansible_default_ipv4.address }}.nip.io
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: console
+            port:
+              number: 9000
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: console
+  namespace: okd-console
+spec:
+  ports:
+    - name: http
+      port: 9000
+      targetPort: 9000
+  selector:
+    app: console
+

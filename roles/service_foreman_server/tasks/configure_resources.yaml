@@ -1,0 +1,50 @@
+---
+- name: "Configure / Create domain: {{ foreman_domain }}"
+  command: "python3 ./hammer.py domain create --name {{ foreman_domain }}"
+  args:
+    chdir: "{{ foreman_work_dir }}"
+  register: cmd
+  changed_when: cmd.rc == 1
+  failed_when: cmd.rc >= 2
+
+- name: "Conigure / Create Networks"
+  command: "python3 ./hammer.py subnet create --name {{ net.name }} --boot-mode={{ net.bootmode | default('Static') }} --dns-primary {{ net.dns1 }} --dns-secondary {{ net.dns2 }} --domains {{ foreman_domain }} --mask '{{ net.netmask | default('255.255.255.0') }}' --network {{ net.networkid }} --gateway={{ net.gateway }} --from {{ net.hoststart }} --to {{ net.hostend }} --ipam 'Internal DB' --tftp-id AUTO_PROXY_{{ ansible_fqdn }} --dns-id AUTO_PROXY_{{ ansible_fqdn }} --dhcp-id AUTO_PROXY_{{ ansible_fqdn }}" 
+  args:
+    chdir: "{{ foreman_work_dir }}"
+  register: cmd
+  failed_when: cmd.rc >= 2
+  changed_when: cmd.rc == 1
+  loop: "{{ foreman_networks }}"
+  loop_control:
+    loop_var: net
+
+- name: "Configure / Create compute-profiles"
+  include_tasks: import_create_computeprofile.yaml
+  loop: "{{ foreman_flavors }}"
+  loop_control:
+    loop_var: profile
+
+- name: "Configure / OS / Copy Configuration templates into place"
+  copy:
+    src: "{{ item }}"
+    dest: "{{ foreman_work_dir }}"
+    force: yes
+  with_fileglob:
+    - "*.cfg"
+
+- import_tasks: import_create_os.yaml
+
+- name: "Configure / Create Environment: production"
+  command: "python3 ./hammer.py environment create --name {{ item }}"
+  args:
+    chdir: "{{ work_dir }}/service_foreman_server"
+  register: cmd
+  failed_when: cmd.rc >= 2
+  changed_when: cmd.rc == 1
+  loop: "{{ foreman_environments }}"
+
+- name: "Configure / Hostgroups / Create Host Group"
+  include_tasks: import_create_hostgroup.yaml
+  loop: "{{ foreman_groups }}"
+  loop_control:
+    loop_var: group

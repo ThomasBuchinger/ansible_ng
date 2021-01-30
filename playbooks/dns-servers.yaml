@@ -1,0 +1,6 @@
+- name: Configure DNS
+  hosts: dns_servers
+  roles:
+    - role: app_dnsmasq
+      vars:
+        dnsmasq_static_dns: "{{ static_dns }}"

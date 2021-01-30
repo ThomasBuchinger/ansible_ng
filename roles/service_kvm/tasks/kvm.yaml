@@ -1,0 +1,46 @@
+---
+- name: "Install / Install Packages"
+  ansible.builtin.yum:
+    name:
+      - qemu-kvm
+      - libvirt
+      - virt-install
+      - libguestfs-tools 
+    state: present
+  become: yes
+- name: "Install / RHEL 7 python bindings"
+  ansible.builtin.yum:
+    name:
+      - libvirt-python
+      - python-lxml
+    state: present
+  become: yes
+  when: ansible_distribution_major_version == '7'
+- name: "Install / RHEL 8 python bindings"
+  ansible.builtin.yum:
+    name:
+      - python3-libvirt
+      - python3-lxml 
+    state: present
+  become: yes
+  when: ansible_distribution_major_version == '8'
+
+- name: "Install / Enable Service"
+  ansible.builtin.systemd:
+    name: libvirtd
+    enabled: yes
+    state: started
+  become: yes
+
+- name: "Install / Configure KVM Kernel Params"
+  ansible.builtin.template:
+    src: kvm-kernel_params.conf
+    dest: /etc/modprobe.d/kvm.conf
+  become: yes
+
+- name: "Cockpit / Install cockpit plugin for libvirt"
+  ansible.builtin.yum:
+    name:
+      - cockpit-machines
+    state: present
+  become: yes

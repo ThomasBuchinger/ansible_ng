@@ -1,0 +1,59 @@
+---
+# Set agruments for Hammer-CLI
+# This is required to be able to omit an argument if the varialbe is not set in {{ group }}
+#
+- name: "Configure / Hostgroups / Set variables"
+  set_fact:
+    required:
+      - python3
+      - ./hammer.py
+      - hostgroup
+      - create
+      - --name
+      - "{{ group.name }}"
+      - --architecture
+      - "{{ group.arch | default('x86_64') }}"
+    domain:
+      - --domain
+      - "{{ group.domain | default(foreman_domain) }}"
+    env:
+      - --puppet-environment
+      - "{{ group.env | default('') }}"
+    os:
+      - --operatingsystem
+      - "{{ group.os | default('') }}"
+    medium:
+      - --medium
+      - "{{ group.medium | default('') }}"
+    compute_profile:
+      - --compute-profile
+      - "{{ group.compute_profile | default('') }}"
+    compute_resource:
+      - --compute-resource
+      - "{{ group.compute_resource | default('') }}"
+    pxe:
+      - --pxe-loader
+      - "{{ group.pxe | default('') }}"
+    ptable:
+      - --partition-table
+      - "{{ group.ptable | default('') }}"
+    root:
+      - --root-password
+      - "{{ group.root_password | default('') }}"
+    network:
+      - --subnet
+      - "{{ group.subnet | default('') }}"
+    jmespath: "[?(@[1] != '')]"
+    
+
+
+- name: "Configure / Hostgroups / Create Host Group"
+  command:
+    argv: "{{ required + command }}"
+  args:
+    chdir: "{{ foreman_work_dir }}"
+  register: cmd
+  failed_when: cmd.rc >= 2
+  changed_when: cmd.rc == 1
+  vars:
+    command: "{{ [domain, env, os, medium, compute_profile, compute_resource, pxe, ptable, root, network] | json_query(jmespath) | flatten }}"

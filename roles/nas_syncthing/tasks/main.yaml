@@ -1,0 +1,10 @@
+---
+- name: Deploy / Syncthing
+  include_role: 
+    role: base_kubernetes
+    tasks_from: apply_ns.yaml
+  vars:
+    k8s_namespace: syncthing
+    k8s_manifest: "{{ lookup('template', 'syncthing.yaml') }}"
+    k8s_app: Syncthing
+

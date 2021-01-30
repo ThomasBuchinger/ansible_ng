@@ -1,0 +1,45 @@
+---
+- name: "Configure / OS / Create partition tables"
+  command: "python3 ./hammer.py partition-table create --name {{ item | basename | quote }} --file ./{{ item | basename }}  --os-family Redhat"
+  args:
+    chdir: "{{ foreman_work_dir }}"
+  register: cmd
+  failed_when: cmd.rc >= 2
+  changed_when: cmd.rc == 1
+  with_fileglob:
+    - "partition*.cfg"
+
+
+- name: "Configure / OS / Create OS: CentOS 7"
+  command: "python3 ./hammer.py os create --name 'Centos7' --architectures 'x86_64' --description 'Centos7' --family 'Redhat' --major 7 --media 'CentOS 7 mirror' --password-hash SHA512"
+  args:
+    chdir: "{{ foreman_work_dir }}"
+  register: os_cmd
+  failed_when: os_cmd.rc >= 2
+  changed_when: os_cmd.rc == 1
+- name: "Configure / OS / Configure OS: CentOS 7"
+  command: "python3 ./post-config-os.py --os 'Centos7' --provision 'Kickstart default' --pxe 'Kickstart default PXELinux' --partition {{ lookup('fileglob', 'partition-rhel*.cfg').split(',') | map('basename') | join(' ') }}"
+  args:
+    chdir: "{{ foreman_work_dir }}"
+  when: os_cmd.changed
+  register: cmd
+  failed_when: cmd.rc >= 2
+  changed_when: cmd.rc == 1
+
+
+- name: "Configure / OS / Create OS: CentOS 8"
+  command: "python3 ./hammer.py os create --name 'Centos8' --architectures 'x86_64' --description 'Centos8' --family 'Redhat' --major 8 --media 'CentOS 8 mirror' --password-hash SHA512"
+  args:
+    chdir: "{{ foreman_work_dir }}"
+  register: os_cmd
+  failed_when: os_cmd.rc >= 2
+  changed_when: os_cmd.rc == 1
+- name: "Configure / OS / Configure OS: CentOS 8"
+  command: "python3 ./post-config-os.py --os 'Centos8' --provision 'Kickstart default' --pxe 'Kickstart default PXELinux' --partition {{ lookup('fileglob', 'partition-rhel*.cfg').split(',') | map('basename') | join(' ') }}"
+  args:
+    chdir: "{{ foreman_work_dir }}"
+  when: os_cmd.changed
+  register: cmd
+  failed_when: cmd.rc >= 2
+  changed_when: cmd.rc == 1
+

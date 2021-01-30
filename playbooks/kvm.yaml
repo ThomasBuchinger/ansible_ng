@@ -1,0 +1,6 @@
+---
+- name: Install KVM Hypervisors
+  hosts: kvm_hypervisors
+  roles:
+    - comp_terraform
+    - service_kvm

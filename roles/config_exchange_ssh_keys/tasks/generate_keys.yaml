@@ -1,0 +1,16 @@
+---
+- name: Create Directory
+  ansible.builtin.file:
+    path: "{{ key_exchange_path }}"
+    state: directory
+    owner: "{{ key_exchange_user }}"
+    group: "{{ key_exchange_user }}"
+    mode: 0700
+
+# Generate Keys if they don't exist
+- name: keygen / Generate keys for each host
+  community.crypto.openssh_keypair:
+    path: "{{ key_exchange_path }}/{{ key_exchange_key_name }}"
+    state: present
+    comment: "{{ key_exchange_comment }}"
+  register: keys

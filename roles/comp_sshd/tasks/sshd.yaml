@@ -1,0 +1,35 @@
+- name: sshd / Set global options
+  lineinfile:
+    line: "{{ item.line }}"
+    regexp: "{{ item.regex | default(omit) }}"
+    state: present
+    path: /etc/ssh/sshd_config
+    backup: yes
+    firstmatch: yes
+  notify: restart_ssh
+  loop:
+    - { line: "AddressFamily inet", regex: "AddressFamily" }
+    - { line: "Protocol 2", regex: "Protocol" }
+    - { line: "X11Forwarding no", regex: "^X11Forwarding" }
+    - { line: "PermitUserEnvironment no", regex: "PermitUserEnvironment" }
+    - { line: "AllowAgentForwarding no", regex: "AllowAgentForwarding" }
+    - { line: "AllowTcpForwarding no", regex: "AllowTcpForwarding" }
+    - { line: "PermitTunnel no", regex: "PermitTunnel" }
+
+    - { line: "AllowGroups root admins", regex: "AllowGroups" }
+
+    - { line: "PermitRootLogin yes", regex: "^PermitRootLogin" }
+    - { line: "PasswordAuthentication no", regex: "^PasswordAuthentication" }
+    - { line: "PermitEmptyPasswords no", regex: "^#?PermitEmptyPasswords" }
+    - { line: "ChallengeResponseAuthentication no", regex: "^ChallengeResponseAuthentication" }
+    - { line: "KerberosAuthentication no", regex: "KerberosAuthentication" }
+    - { line: "GSSAPIAuthentication no", regex: "^GSSAPIAuthentication" }
+  
+- name: sshd / Configure external access
+  blockinfile:
+    content: "{{ item.content }}"
+    path: /etc/ssh/sshd_config
+  notify: restart_ssh
+  when: nat_server is defined
+  loop:
+  - { content: "Match Host {{ nat_server }}\n  PermitRootLogin no" }

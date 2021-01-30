@@ -1,0 +1,5 @@
+---
+- name: Check / Is Ansible Public-Key set?
+  fail:
+    msg: No Public Key found
+  when: ansible_public_key | length < 1

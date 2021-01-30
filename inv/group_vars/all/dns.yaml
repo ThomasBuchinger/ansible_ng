@@ -1,0 +1,10 @@
+dns_domain: "mydomain.local"    # internal DNS Domain
+dns_ip: ""                    # Internal DNS Server
+dns_server:
+  - 1.1.1.1
+  - 8.8.8.8
+
+static_dns: []
+
+public_domain: wildcard.public.com
+public_port: 8443

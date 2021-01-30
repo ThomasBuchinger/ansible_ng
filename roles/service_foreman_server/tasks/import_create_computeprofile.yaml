@@ -1,0 +1,36 @@
+
+- name: "Configure / Compute Profile / Create Profile {{ profile.name }}"
+  command: "python3 ./hammer.py compute-profile create --name {{ profile.name }}"
+  args:
+    chdir: "{{ foreman_work_dir }}"
+  register: profile_cmd
+  failed_when: profile_cmd.rc >= 2
+  changed_when: profile_cmd.rc == 1
+
+- name: "Configure / Compute Profile / Add Profile {{ profile.name }} to KVM compute resources"
+  command: "hammer compute-profile values create --compute-profile {{ profile.name }} --compute-resource {{ compute.name }} --compute-attributes cpus={{ profile.cpus }},memory={{ profile.memory * 1024 * 1024 * 1024 }}{{ profile.adv_kvm_compute | default(kvm_compute) }} --volume {{ profile.adv_kvm_volume | default(kvm_volume) }} --interface {{ profile.adv_kvm_interface | default(kvm_interface) }} {{ profile.extra_kvm_params | default(kvm_params)  }}"
+  vars:
+    kvm_compute: ",cpu_mode=host-passthrough"
+    kvm_volume: "pool_name={{ profile.storage_location | default('default') }},capacity={{ profile.size }}G,format_type=qcow2,allocation={{ profile.storage_thin | ternary('0',profile.size) }}"
+    kvm_interface: "compute_type=bridge,compute_bridge={{ profile.network }},compute_model=virtio"
+    kvm_params: ""
+  loop: "{{ foreman_compute }}"
+  loop_control:
+    loop_var: compute
+  when: 
+    - profile_cmd.rc == 1
+    - "'kvm' in (foreman_compute | map(attribute='type') | flatten)"
+
+- name: "Configure / Compute Profile / Add Profile {{ profile.name }} to VMware compute resources"
+  command: "hammer compute-profile values create --compute-profile {{ profile.name }} --compute-resource {{ compute.name }} --compute-attributes cpus={{ profile.cpus }},memory_mb={{ profile.memory * 1024 }}{{ profile.adv_vmware_compute | default(vmware_compute) }} --volume {{ profile.adv_vmware_volume | default(vmware_volume) }} --interface {{ profile.adv_vmware_interface | default(vmware_interface) }} {{ profile.extra_vmware_params | default(vmware_params)  }}"
+  vars:
+    vmware_compute: ",cluster={{ profile.cluster_id }},corespersocket=1,path={{ profile.vmpath }},resource_pool={{ profile.resource_pool_id }},guestid=centos8_64Guest,memoryHotAddEnabled=1,cpuHotAddEnabled=1,add_cdrom=1"
+    vmware_volume: "name=os,datastore={{ profile.storage_location }},mode=persistent,size_gb={{ profile.size }},thin={{ profile.storage_thin | ternary('true','false') }}"
+    vmware_interface: "compute_type=VirtualVmxnet3,compute_network={{ profile.network }}"
+    vmware_params: ""
+  loop: "{{ foreman_compute }}"
+  loop_control:
+    loop_var: compute
+  when: 
+    - profile_cmd.rc == 1
+    - "'vmware' in (foreman_compute | map(attribute='type') | flatten)"

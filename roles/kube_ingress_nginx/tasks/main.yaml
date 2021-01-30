@@ -1,0 +1,16 @@
+---
+- name: Deploy / NGINX Ingress Controller
+  include_role: 
+    role: base_kubernetes
+    tasks_from: apply_ns.yaml
+  vars:
+    k8s_namespace: ingress-nginx
+    k8s_manifest: "{{ lookup('template', 'nginx-ingress.yaml') }}"
+    k8s_app: NGINX
+
+- name: Deploy / Wait for NGINX
+  command: kubectl wait --for=condition=Available -n ingress-nginx deployment/ingress-nginx-controller
+  changed_when: false
+  become: yes
+  async: 180
+  poll: 5

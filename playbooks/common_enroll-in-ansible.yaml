@@ -1,0 +1,6 @@
+- name: Create ansible user
+  hosts: all
+  vars:
+    ansible_user: root
+  roles:
+    - config_enroll_ansible

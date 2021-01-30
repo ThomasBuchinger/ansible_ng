@@ -1,0 +1,16 @@
+- name: "Stuff that does not fit any other playbook"
+  hosts: all
+  roles:
+    - app_cockpit
+  tasks:
+    - name: Config / SSH / Disable reverse DNS lookup on login
+      ansible.builtin.lineinfile:
+        path: /etc/ssh/sshd_config
+        line: UseDNS no
+        regexp: '#?UseDNS'
+      become: yes
+    - name: APP / vim / Install vim
+      yum:
+        name: vim
+        state: present
+      become: yes

@@ -1,0 +1,61 @@
+---
+- name: "Prepare Host / Set FQDN"
+  ansible.builtin.hostname:
+    name: "{{ foreman_hostname }}.{{ foreman_domain }}"
+- name: "Prepare Host / Update facts"
+  setup: {}
+
+- name: "Prepare Host / Set /etc/hosts"
+  ansible.builtin.lineinfile:
+    dest: /etc/hosts
+    regexp: "{{ ansible_default_ipv4.address }}"
+    line: "{{ ansible_default_ipv4.address }}    {{ foreman_hostname }}.{{ foreman_domain }} {{ foreman_hostname }}"
+    backup: no
+
+- name: "Prepare Host / Install Foreman repo for el8"
+  ansible.builtin.dnf:
+    name:
+    - "@{{ foreman_python }}/common" # Need python to run wrapper scripts
+    - "@{{ foreman_ruby }}/common"
+    - epel-release
+    - http://yum.puppet.com/puppet6-release-el-8.noarch.rpm
+    - "https://yum.theforeman.org/releases/{{ foreman_version }}/el8/x86_64/foreman-release.rpm"
+    state: present
+    disable_gpg_check: yes
+    validate_certs: no
+  when: ansible_distribution_major_version == "8"
+
+- name: "Prepare Host / Install Foreman repo for el7"
+  ansible.builtin.yum:
+    name:
+      - epel-release
+      - http://yum.puppet.com/puppet6-release-el-7.noarch.rpm
+      - "https://yum.theforeman.org/releases/{{ foreman_version }}/el7/x86_64/foreman-release.rpm"
+      - foreman-release-scl
+    state: present
+    validate_certs: no
+  when: ansible_distribution_major_version == "7"
+
+- name: "Prepare Host / Install foreman-installer"
+  ansible.builtin.yum:
+    name:
+      - foreman-installer
+    state: present
+- name: "Prepare Host / Create Foreman Directory"
+  ansible.builtin.file:
+    name: /etc/foreman-installer/scenarios.d/
+    state: directory
+
+- name: "Prepare Host / Create work directory"
+  ansible.builtin.file:
+    name: "{{ foreman_work_dir }}"
+    state: directory
+- name: "Prepare Host / Copy helper scripts to target"
+  ansible.builtin.copy:
+    src: "{{ item }}"
+    dest: "{{ foreman_work_dir }}/{{ item }}"
+    mode: 755
+  loop: 
+  - "hammer.py"
+  - "post-config-os.py"
+

@@ -1,0 +1,15 @@
+---
+- name: "User / Create user"
+  ansible.builtin.user:
+    name: syncthing
+    home: "{{ syncthing_homedir }}"
+    create_home: false
+    password: '!'
+    shell: /bin/false
+    state: present
+- name: "User / Create home {{ syncthing_homedir }}"
+  ansible.builtin.file:
+    path: "{{ syncthing_homedir }}"
+    state: directory
+    owner: syncthing
+    group: syncthing

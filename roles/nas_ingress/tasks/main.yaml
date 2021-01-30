@@ -1,0 +1,13 @@
+---
+- name: Deploy / NAS Ingress config
+  include_role: 
+    role: base_kubernetes
+    tasks_from: apply_global.yaml
+  vars:
+    k8s_namespace: nas
+    k8s_manifest: "{{ lookup('template', item) }}"
+    k8s_app: "{{ item }}"
+  loop:
+    - nas-ingress.yaml
+    - internal-ingress.yaml
+

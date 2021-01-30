@@ -1,0 +1,30 @@
+foreman_groups:
+  - {name: "example", arch:  "x86_64", domain: "{{ foreman_domain }}", env: "production", os: "", medium: "", compute_profile: "", compute_resource: "", pxe:"", ptable: "", root_password: "", subnet: "" }
+
+foreman_environments:
+  - production
+  - fat
+  - dev
+
+foreman_networks:
+  - { name: "example", default: false, networkid: "192.168.1.0", netmask: "255.255.255.0", gateway: "192.168.1.1", dns1: "1.1.1.1", dns2: "8.8.8.8", hoststart: "192.168.1.10", hostend: "192.168.1.49" }
+
+foreman_compute:
+  - { name: "kvm-example", type: "kvm", url: "", default: false }
+  - { name: "vmware-example", type: "vmware", default: false, server: "<server>", user: "<user>", password: "<password>"}
+
+foreman_flavors:
+  - name: normal
+    cpus: 1
+    memory: 2
+    size: 100
+    network: br0
+    storage_location: default
+    storage_thin: true
+  - name: small
+    cpus: 1
+    memory: 0.5
+    size: 30
+    network: br0
+    storage_location: default
+    storage_thin: true

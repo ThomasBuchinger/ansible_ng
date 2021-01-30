@@ -1,0 +1,19 @@
+---
+- name: Check / Variables are set
+  ansible.builtin.fail:
+    msg: "Required variable not found: server={{ mount.server }} remote_path={{ mount.remote_path }} mountpoint={{ mount.path }}"
+  when: (mount.server | default('') | length < 1) or
+    (mount.remote_path | default('') | length < 1) or
+    (mount.path | default('') | length < 1)
+  loop: "{{ nfs_mounts }}"
+  loop_control:
+    loop_var: mount
+
+- name: Check / Path does not start with /
+  ansible.builtin.fail:
+    msg: Remote Path cannot start with '/' (slash)
+  when: mount.remote_path[0] == '/'
+  loop: "{{ nfs_mounts }}"
+  loop_control:
+    loop_var: mount
+

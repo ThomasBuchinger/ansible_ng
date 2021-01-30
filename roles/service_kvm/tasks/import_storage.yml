@@ -1,0 +1,24 @@
+---
+
+- name: "Storage / {{ pool.name }} / Create directory"
+  ansible.builtin.file:
+    path: "{{ pool.dir }}"
+    state: directory
+  become: yes
+
+- name: "Storage / {{ pool.name }} / Define storage pool"
+  community.libvirt.virt_pool:
+    name: "{{ pool.name }}"
+    state: present
+    xml: '{{ lookup("template", "storage_default.xml.j2") }}'
+  become: yes
+- name: "Storage / Start default storage"
+  community.libvirt.virt_pool:
+    name: "{{ pool.name }}"
+    state: active
+  become: yes
+- name: "Storage / Set autostart for default storage"
+  community.libvirt.virt_pool:
+    name: "{{ pool.name }}"
+    autostart: true
+  become: yes

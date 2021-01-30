@@ -1,0 +1,14 @@
+---
+# Get Shell script
+ddns_client_download_base_url: https://raw.githubusercontent.com/ThomasBuchinger/shell-ddns-client/
+ddns_client_executeable: ddns-client.sh
+ddns_client_branch: main
+
+# Gneral variables
+ddns_client_hostnames: []
+ddns_client_domain:
+ddns_client_provider:
+ddns_client_log_level: 1
+
+# Authentication
+ddns_client_authtype:

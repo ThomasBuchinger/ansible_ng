@@ -1,0 +1,4 @@
+- import_tasks: admins.yaml
+  become: yes
+- import_tasks: sshd.yaml
+  become: yes

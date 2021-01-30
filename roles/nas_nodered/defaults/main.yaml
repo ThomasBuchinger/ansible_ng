@@ -1,0 +1,30 @@
+---
+traefik_version: 2.3
+
+traefik_args_default:
+  - --accesslog
+  - --ping=true
+  - --log.level=INFO
+  - --global.checknewversion=false
+traefik_args_static_conf:
+  - --entryPoints.traefik.address=:8100
+  - --entryPoints.web.address=:80
+  - --entryPoints.websecure.address=:443
+  - --serversTransport.insecureSkipVerify=true
+traefik_args_provider:
+  - --providers.kubernetescrd=true
+  - '--providers.kubernetescrd.labelselector=lab/ingress-ignore != yes'
+  - --providers.kubernetesingress=true
+  - '--providers.kubernetesingress.labelselector=lab/ingress-ignore != yes'
+traefik_args_api:
+  - --api
+  - --api.insecure=true
+  - --api.dashboard=true
+  # Tracing
+  #- --tracing.jaeger.collector.endpoint=http://jaeger-collector.monitor.svc.cluster.local:14268/api/traces?format=jaeger.thrift
+
+  # Metrics
+  #- --metrics.prometheus=true
+  #- --entryPoints.metrics.address=:8082
+  #- --metrics.prometheus.entryPoint=metrics
+  #- --metrics.prometheus.addServicesLabels=true

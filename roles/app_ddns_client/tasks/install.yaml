@@ -1,0 +1,38 @@
+---
+- name: Install / Create Directory
+  ansible.builtin.file:
+    path: "{{ work_dir }}/ddns-client"
+    state: directory
+- name: Install / Download Script
+  ansible.builtin.get_url:
+    url: "{{ download_url }}"
+    dest: "{{ work_dir }}/ddns-client/ddns-client.sh"
+    mode: 0755
+  vars:
+    download_url: "{{ ddns_client_download_base_url }}/{{ ddns_client_branch }}/{{ ddns_client_executeable }}"
+- name: Install / Copy config file
+  ansible.builtin.template:
+    src: shell-ddns.env.j2
+    dest: /etc/shell-ddns.env
+    mode: 0644
+    owner: root
+    group: root
+  become: yes
+
+- name: Systemd / Create Units
+  ansible.builtin.template:
+    src: "{{ item }}.j2"
+    dest: "/etc/systemd/system/{{ item }}"
+    mode: 0644
+  become: yes
+  loop:
+    - shell-ddns.service
+    - shell-ddns.timer
+
+- name: Systemd / Enable Service
+  ansible.builtin.systemd:
+    name: shell-ddns.timer
+    daemon-reload: yes
+    enabled: yes
+    state: started
+  become: yes

@@ -1,0 +1,38 @@
+---
+- name: dnsmasq / Install Package
+  ansible.builtin.yum:
+    name: dnsmasq
+    state: present
+  become: yes
+
+- name: dnsmasq / Enable Service
+  ansible.builtin.systemd:
+    name: dnsmasq.service
+    state: started
+    enabled: yes
+  become: yes
+
+- name: dnsmasq / Open firewall
+  ansible.posix.firewalld:
+    port: 53/udp
+    permanent: yes
+    immediate: yes
+    state: enabled
+  become: yes
+
+- name: dnsmasq / Copy configuration
+  ansible.builtin.template:
+    src: dnsmasq.conf.j2
+    dest: "/etc/dnsmasq.d/config_by_ansible.conf"
+  notify: restart_dnsmasq
+  become: yes
+
+- name: dnsmasq / Edit /etc/hosts
+  ansible.builtin.lineinfile:
+    line: "{{ item.ip }} {{ item.names }}"
+    dest: "/etc/hosts"
+  loop: "{{ dnsmasq_etc_hosts }}"
+  when: dnsmasq_etc_hosts is defined
+  notify: restart_dnsmasq
+  become: yes
+

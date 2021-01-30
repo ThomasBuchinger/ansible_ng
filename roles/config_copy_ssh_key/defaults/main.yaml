@@ -1,0 +1,5 @@
+copy_ssh_path: "~/.ssh"
+copy_ssh_key_name: id_rsa
+copy_ssh_user: "{{ ansible_user }}"
+copy_ssh_group: "{{ ansible_user }}"
+

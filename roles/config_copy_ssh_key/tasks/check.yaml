@@ -1,0 +1,7 @@
+---
+- name: Check / Mandatory parameters
+  ansible.builtin.fail:
+    msg: "Mandatory parameter not found: private_key={{ copy_ssh_private_key }} public_key={{ copy_ssh_public_key }}"
+  when: (copy_ssh_private_key | default('') | length < 1) or
+    (copy_ssh_public_key | default('') | length < 1)
+

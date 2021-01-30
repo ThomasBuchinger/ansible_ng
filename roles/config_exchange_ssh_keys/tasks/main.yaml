@@ -1,0 +1,21 @@
+---
+- import_tasks: check.yaml
+  tags:
+    - config_exchange_ssh_keys
+    - config_exchange_ssh_keys:check
+- import_tasks: generate_keys.yaml
+  when: key_exchange_generate_keys
+  tags:
+    - config_exchange_ssh_keys
+    - config_exchange_ssh_keys:generate_keys
+    - config_exchange_ssh_keys:authorized_keys
+- import_tasks: authorized_keys.yaml
+  when: key_exchange_generate_keys and key_exchange_authorized_keys
+  tags:
+    - config_exchange_ssh_keys
+    - config_exchange_ssh_keys:authorized_keys
+- import_tasks: keyscan.yaml
+  when: key_exchange_keyscan
+  tags:
+    - config_exchange_ssh_keys
+    - config_exchange_ssh_keys:keyscan

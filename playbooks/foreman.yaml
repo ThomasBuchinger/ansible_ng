@@ -1,0 +1,55 @@
+- name: Prepare SSH Keys for Foreman
+  hosts: foreman_servers,kvm_hypervisors
+  pre_tasks:
+    - name: Foreman+KVM / User / Prepare integration user "foreman"
+      ansible.builtin.user:
+        name: foreman
+        home: /usr/share/foreman
+        create_home: yes
+      become: yes
+    - name: Foreman+KVM / User / Add foreman to libvirt group
+      ansible.builtin.user:
+        name: foreman
+        append: yes
+        groups: libvirt
+      become: yes
+      when: "'kvm_hypervisors' in group_names"
+  roles:
+    - role: config_exchange_ssh_keys
+      key_exchange_user: foreman
+      key_exchange_path: /usr/share/foreman/.ssh
+      key_exchange_generate_keys: true
+      key_exchange_authorized_keys: true
+      key_exchange_keyscan: true
+      become: yes
+      become_user: foreman
+
+- name: Install Foreman Server
+  hosts: foreman_servers
+  pre_tasks:
+    - name: Foreman+RemoteExec / Prepare SSH key
+      ansible.builtin.user:
+        name: foreman-proxy
+        home: /usr/share/foreman-proxy
+        create_home: yes
+      become: yes
+  roles:
+    - role: config_copy_ssh_key
+      vars:
+        copy_ssh_private_key: "{{ ansible_private_key }}"
+        copy_ssh_public_key: "{{ ansible_public_key }}"
+        copy_ssh_key_name: ansible_key
+        copy_ssh_path: /usr/share/foreman-proxy/.ssh
+        copy_ssh_user: foreman-proxy
+        copy_ssh_group: foreman-proxy
+      become: yes
+    - role: service_foreman_server
+      vars:
+        foreman_version: 2.2
+        foreman_domain: "{{ dns_domain }}"
+        foreman_work_dir: "{{ work_dir }}/service_foreman"
+        foreman_key_name: ansible_key
+        foreman_default_net_dns_forwarders: 
+          - 8.8.8.8
+          - 1.1.1.1
+      become: yes

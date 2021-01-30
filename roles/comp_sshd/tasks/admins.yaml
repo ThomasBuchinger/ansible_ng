@@ -1,0 +1,11 @@
+- name: "sshd / Add group: admins"
+  ansible.builtin.group:
+    name: admins
+    state: present
+- name: "sshd / Add admin users to group {{ sshd_admins | join(', ') }}"
+  ansible.builtin.user:
+    name: "{{ item }}"
+    groups: admins
+    append: yes
+  loop: "{{ sshd_admins }}"
+

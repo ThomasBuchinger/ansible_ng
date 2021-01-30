@@ -1,0 +1,14 @@
+---
+- import_playbook: playbooks/common_enroll-in-ansible.yaml
+- import_playbook: playbooks/common_stuff-i-like.yaml
+- import_playbook: playbooks/common.yaml
+- import_playbook: playbooks/ddns-updater.yaml
+- import_playbook: playbooks/dns-servers.yaml
+- import_playbook: playbooks/kvm.yaml
+#- import_playbook: kvm.yaml
+#- import_playbook: foreman.yaml
+#- import_playbook: kubecluster.yaml
+#- import_playbook: kubeapps.yaml
+
+
+#- include: rasp-m3.yml

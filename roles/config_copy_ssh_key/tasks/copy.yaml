@@ -1,0 +1,21 @@
+- name: Copy / Ensure directory exists
+  ansible.builtin.file:
+    path: "{{ copy_ssh_path }}"
+    state: directory
+    mode: 0700
+    owner: "{{ copy_ssh_user }}"
+    group: "{{ copy_ssh_group }}"
+- name: Copy / copy private_key
+  ansible.builtin.copy:
+    content: "{{ copy_ssh_private_key }}"
+    dest: "{{ copy_ssh_path }}/{{ copy_ssh_key_name }}"
+    owner: "{{ copy_ssh_user }}"
+    group: "{{ copy_ssh_group }}"
+    mode: 0600
+- name: Copy / copy public_key
+  ansible.builtin.copy:
+    content: "{{ copy_ssh_public_key }}.pub"
+    dest: "{{ copy_ssh_path }}/{{ copy_ssh_key_name }}.pub"
+    owner: "{{ copy_ssh_user }}"
+    group: "{{ copy_ssh_group }}"
+    mode: 0644

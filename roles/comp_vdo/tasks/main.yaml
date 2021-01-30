@@ -1,0 +1,15 @@
+---
+- import_tasks: check.yaml
+  tags:
+    - config_vdo
+- name: "Install / Install vdo packages"
+  ansible.builtin.yum:
+    name: vdo
+    state: present
+  tags:
+    - config_vdo
+
+- import_tasks: vdo.yaml
+  tags:
+    - config_vdo
+    - config_vdo:mount

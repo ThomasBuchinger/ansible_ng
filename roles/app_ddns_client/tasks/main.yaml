@@ -1,0 +1,11 @@
+---
+- import_tasks: check_vars.yaml
+  tags:
+    - app_ddns_client
+    - app_ddns_client:check
+
+- import_tasks: install.yaml
+  tags:
+    - app_ddns_client
+    - app_ddns_client:install
+

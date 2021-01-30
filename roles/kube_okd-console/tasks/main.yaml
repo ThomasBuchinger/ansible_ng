@@ -1,0 +1,10 @@
+---
+- name: Deploy / OKD Console
+  include_role: 
+    role: base_kubernetes
+    tasks_from: apply_ns.yaml
+  vars:
+    k8s_namespace: okd-console
+    k8s_manifest: "{{ lookup('template', 'okd-console.yaml') }}"
+    k8s_app: OKD Console
+

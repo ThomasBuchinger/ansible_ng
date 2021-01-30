@@ -1,0 +1,86 @@
+---
+- name: Check / Check variables
+  ansible.builtin.fail:
+    msg: "Mandatory parameter not found! hostname={{ foreman_host }} domain={{ foreman_domain }} work_dir={{ foreman_work_dir }} password={{ foreman_admin_password }}"
+  when: (foreman_hostname | default('') | length < 1 ) or
+    (foreman_domain | default('') | length < 1 ) or
+    (foreman_work_dir | default('') | length < 1 ) or
+    (foreman_admin_password | default('') | length < 1 )
+- name: Check / Allow only rhel distributions
+  ansible.builtin.fail:
+    msg: Role assumes Red Hat family of distributions. Mostly because of Repos
+  when: ansible_os_family == "Red Hat"
+
+- name: Check / Compute / KVM compute resources
+  ansible.builtin.fail:
+    msg: "Compute Resource {{ res.name }} missing attribute: url={{ res.url }}"
+  when:
+    - (res.type | default('') | length < 1 ) or
+      (res.name | default('') | length < 1 ) or
+      (res.url | default('') | length < 1 )
+    - "res.type == 'kvm'"
+  loop: "{{ foreman_compute }}"
+  loop_control:
+    loop_var: res
+
+- name: Check / Compute / VMware compute resources
+  ansible.builtin.fail:
+    msg: "Compute Resource {{ res.name }} missing attribute: {{ res }}"
+  when:
+    - (res.type | default('') | length < 1 ) or
+      (res.name | default('') | length < 1 ) or
+      (res.datacenter | default('') | length < 1 ) or
+      (res.server | default('') | length < 1 ) or
+      (res.user | default('') | length < 1 ) or
+      (res.password | default('') | length < 1 )
+    - "res.type == 'vmware'"
+  loop: "{{ foreman_compute }}"
+  loop_control:
+    loop_var: res
+
+- name: Check / Network variables
+  ansible.builtin.fail:
+    msg: "Invalid Network {{ n.name }}: {{ n }}"
+  when: (n.name | default('') | length < 1 ) or
+    (n.networkid | default('') | length < 1 ) or
+    (n.dns1 | default('') | length < 1 ) or
+    (n.dns2 | default('') | length < 1 ) or
+    (n.gateway | default('') | length < 1 ) or
+    (n.hoststart | default('') | length < 1 ) or
+    (n.hostend | default('') | length < 1 )
+  loop: "{{ foreman_networks }}"
+  loop_control:
+    loop_var: n
+- debug:
+    msg: "{{ name }} /  {{ cpus }} / {{ mem }} / {{ volume }} / {{ iface }} ||| {{ ifaced }} {{ ifacek }} {{ ifacev }}"
+  vars:
+      name: "{{ (p.name | default('') | length < 1 ) }}"
+      cpus: "{{ (p.cpus | int(-1) > 0 ) }}"
+      mem: "{{ (p.memory is number and p.memory > 0 ) }}"
+      volume: "{{ ((p.adv_kvm_volume | default('') | length < 1 ) and (p.adv_vmware_volume | default('') | length < 1 ) and ((p.size | int(-1) > 0 ) or (p.storage_location | default('') | length < 1 ))) }}"
+      iface: "{{ ((p.adv_kvm_interface | default('') | length < 1 ) and (p.adv_vmware_interface | default('') | length < 1) and (p.network | default('') | length < 1 )) }}"
+      ifacek: "{{ (p.adv_kvm_interface | default('') | length < 1 ) }}"
+      ifacev: "{{ (p.adv_vmware_interface | default('') | length < 1) }}"
+      ifaced: "{{ (p.network | default('') | length < 1 ) }}"
+  loop: "{{ foreman_flavors }}"
+  loop_control:
+    loop_var: p
+- name: Check / Compute Profiles
+  ansible.builtin.fail:
+    msg: "Invalid Compute Profile {{ p.name }}: {{ p }}"
+  when: (p.name | default('') | length < 1 ) or
+      (p.cpus | int(-1) < 0 ) or
+      (p.memory is number and p.memory < 0 ) or
+      ((p.adv_kvm_volume | default('') | length < 1 ) and (p.adv_vmware_volume | default('') | length < 1 ) and ((p.size | int(-1) < 0 ) or (p.storage_location | default('') | length < 1 ))) or
+      ((p.adv_kvm_interface | default('') | length < 1 ) and (p.adv_vmware_interface | default('') | length < 1) and ( p.network | default('') | length < 1 ))
+  loop: "{{ foreman_flavors }}"
+  loop_control:
+    loop_var: p
+
+- name: Check / Hostgroups
+  ansible.builtin.fail:
+    msg: "Invalid Hostgroup {{ h.name }}: {{ h }}"
+  when: (h.name | default('') | length < 1 ) 
+  loop: "{{ foreman_groups }}"
+  loop_control:
+    loop_var: h

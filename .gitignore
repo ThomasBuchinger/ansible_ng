@@ -1,0 +1,12 @@
+*.retry
+
+# Galaxy
+galaxy/*
+!galaxy/requirements.yaml
+
+# Inventory
+/inv/*
+!/inv/ref
+!inv/01-structure.yaml
+!inv/group_vars/
+

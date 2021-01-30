@@ -1,0 +1,10 @@
+---
+- name: Deploy / Traefik Ingress Controller
+  include_role: 
+    role: base_kubernetes
+    tasks_from: apply_ns.yaml
+  vars:
+    k8s_namespace: ingress-controller
+    k8s_manifest: "{{ lookup('template', 'traefik-ingress.yaml') }}"
+    k8s_app: Traefik
+

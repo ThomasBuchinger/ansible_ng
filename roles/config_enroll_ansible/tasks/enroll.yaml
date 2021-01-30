@@ -1,0 +1,25 @@
+---
+- name: "User / Create User {{ enroll_username }}"
+  ansible.builtin.user:
+    name: "{{ enroll_username }}"
+    password: '!'
+    state: present
+    comment: "Ansible Automation user"
+    create_home: yes
+    home: "{{ work_dir }}"
+    system: yes
+- name: User / Authorize public key
+  ansible.posix.authorized_key:
+    user: "{{ enroll_username }}"
+    key: "{{ ansible_public_key }}"
+    state: present
+
+- name: sudo / Ensure sudo is installed
+  ansible.builtin.package:
+    name: sudo
+    state: present
+- name: sudo / Configure sudoers for ansible
+  ansible.builtin.copy:
+    content: >
+      {{ enroll_username }} ALL=(ALL) NOPASSWD: ALL
+    dest: "/etc/sudoers.d/{{ enroll_username }}"

@@ -1,0 +1,20 @@
+- import_tasks: check.yaml
+  tags:
+    - service_kvm
+    - service_kvm:check
+- import_tasks: kvm.yaml
+  tags:
+    - service_kvm
+    - service_kvm:install
+- import_tasks: network_bridge.yml
+  tags:
+    - service_kvm
+    - service_kvm:network
+- include_tasks: 
+    file: import_storage.yml
+  loop_control: 
+    loop_var: pool
+  loop: "{{ libvirt_storage }}"
+  tags:
+    - service_kvm
+    - service_kvm:storage

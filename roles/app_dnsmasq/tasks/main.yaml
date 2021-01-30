@@ -1,0 +1,5 @@
+---
+- import_tasks: dnsmasq.yaml
+  tags:
+    - app_dnsmasq
+    - app_dnsmasq:install

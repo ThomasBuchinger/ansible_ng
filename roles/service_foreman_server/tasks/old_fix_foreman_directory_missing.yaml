@@ -1,0 +1,17 @@
+- name: Fix-1 / Foreman / Create User
+  ansible.builtin.user:
+    name: foreman
+    create_home: no
+- name: Fix-1 / Foreman / Foreman directory not writeable
+  file:
+    path: /usr/share/foreman
+    state: directory
+    recurse: yes
+    owner: foreman
+    group: foreman
+  ignore_errors: yes
+- name: Fix-1 / Foreman / Foreman directory not writeable
+  file:
+    path: /tmp/bundler
+    state: absent
+

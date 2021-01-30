@@ -1,0 +1,13 @@
+---
+key_exchange_hostname: "{{ inventory_hostname }}"
+
+key_exchange_key_name: "{{ key_exchange_hostname }}_{{ key_exchange_user }}"
+key_exchange_comment: "Auto-generated key for host {{ key_exchange_hostname }} and user {{ key_exchange_user }}"
+key_exchange_path: "~/.ssh"
+
+key_exchange_authorized_keys_file: authorized_keys
+key_exchange_known_hosts_file: known_hosts
+
+key_exchange_generate_keys: true
+key_exchange_authorized_keys: true
+key_exchange_keyscan: true

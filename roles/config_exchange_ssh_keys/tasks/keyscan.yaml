@@ -1,0 +1,27 @@
+---
+# Add the public keys from other hosts to known_hosts
+- name: keyscan / Perform keyscan
+  ansible.builtin.command: 
+    cmd: "ssh-keyscan -t rsa,ecdsa,ed25519 {{ item }}"
+  register: keyscan
+  changed_when: false
+  loop: "{{ play_hosts | map('extract', hostvars, 'ansible_host') | list }}"
+- name: keyscan / Check known_hosts file exists
+  ansible.builtin.stat:
+    path: "{{ key_exchange_path }}/{{ key_exchange_known_hosts_file }}"
+  register: known_hosts
+- name: keyscan / Create known_hosts file
+  ansible.builtin.file:
+    path: "{{ key_exchange_path }}/{{ key_exchange_known_hosts_file }}"
+    state: touch
+    mode: 0644
+    owner: "{{ key_exchange_user }}"
+    group: "{{ key_exchange_user }}"
+  when: not known_hosts.stat.exists
+- name: keyscan / Add scanned keys to known_hosts
+  ansible.builtin.lineinfile:
+    regexp: "{{ item | regex_replace('^([^\\s]+) (ssh-[_\\-\\w]+)', '\\1 \\2') | regex_escape() }}"
+    line: "{{ item }}"
+    path: "{{ key_exchange_path }}/{{ key_exchange_known_hosts_file }}"
+    state: present
+  loop: "{{ keyscan.results | map(attribute='stdout_lines') | flatten | select('search','ssh-') | list }}"

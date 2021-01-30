@@ -1,0 +1,11 @@
+---
+# Copy public key to ohter hosts
+- name: authorize key / Copy public key
+  ansible.posix.authorized_key:
+    key: "{{ keys.public_key }}"
+    user: "{{ key_exchange_user }}"
+    path: "{{ key_exchange_path }}/{{ key_exchange_authorized_keys_file }}"
+    state: present
+    manage_dir: yes
+  delegate_to: "{{ item }}"
+  loop: "{{ play_hosts }}"

@@ -1,0 +1,13 @@
+---
+- name: Check / VDO variables
+  ansible.builtin.fail:
+    msg: "Mandatory parameter missing: "
+  when: (vdo_name | default('') | length < 1) or
+    (dev_name | default('') | length < 1) or
+    (mountpoint | default('') | length < 1) or
+    (vdo_lv_size | default('') | length < 1)
+
+- name: "Check / Device available {{ dev_name }}"
+  ansible.builtin.fail:
+    msg: "Invalid device name: {{ dev_name }}"
+  when: "'sectors' in ansible_devices[dev_name]"

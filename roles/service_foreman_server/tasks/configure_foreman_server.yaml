@@ -1,0 +1,138 @@
+---
+#- name: Fix-1 / Foreman / Foreman directory not writeable
+#  file:
+#    path: /usr/share/foreman
+#    state: directory
+#    recurse: yes
+#    owner: foreman
+#    group: foreman
+#  ignore_errors: yes
+#- name: Fix-1 / Foreman / Foreman directory not writeable
+#  file:
+#    path: /tmp/bundler
+#    state: absent
+
+#    --foreman-proxy-dns-reverse={{ foreman_default_net_dns_revzone }}
+#    --foreman-proxy-dns-tsig-principal=foremanproxy/{{ ansible_hostname }}@{{ foreman_domain|upper }}
+#      - --foreman-compute-ec2-version='installed'
+#      - --foreman-compute-gce-version='installed'
+#      - --foreman-compute-libvirt-version='installed'
+#      - --foreman-compute-openstack-version='installed'
+#      - --foreman-compute-ovirt-version='installed'
+#      - --foreman-compute-vmware-version='installed'
+# Disable Foreman-Proxy during install because the registration fails during install
+- name: "Setup / Server / Run Foreman-Installer"
+  ansible.builtin.command:
+    argv:
+      - foreman-installer 
+      - --detailed-exitcodes
+      - --no-colors
+      - --verbose-log-level=warn
+      - --enable-foreman
+      - --enable-foreman-proxy  
+      - --enable-puppet 
+      - --enable-foreman-cli 
+      - --enable-foreman-cli-openscap
+      - --enable-foreman-plugin-ansible
+      - --enable-foreman-plugin-hooks
+      - --enable-foreman-plugin-openscap
+      - --enable-foreman-plugin-ovirt-provision
+      - --enable-foreman-plugin-remote-execution
+      - --enable-foreman-plugin-setup
+      - --enable-foreman-plugin-tasks
+      - --enable-foreman-plugin-templates
+      - --enable-foreman-compute-openstack
+      - --enable-foreman-compute-ovirt
+      - --enable-foreman-compute-vmware
+      - --enable-foreman-compute-libvirt
+
+      - "--foreman-initial-admin-password={{ foreman_admin_password }}"
+      - "--foreman-initial-admin-email={{ foreman_admin_email }}"
+      - --foreman-db-manage=true
+      
+
+      - --foreman-proxy-bind-host="*"
+      - --foreman-proxy-use-sudoers=true 
+      - --foreman-proxy-use-sudoersd=true 
+      - --foreman-proxy-manage-puppet-group=true
+      - --foreman-proxy-manage-sudoersd=true
+      - --foreman-proxy-register-in-foreman=true
+      - "--foreman-proxy-registered-name={{ ansible_fqdn }}"
+      - "--foreman-proxy-foreman-base-url=https://{{ ansible_fqdn }}"
+    
+      - --foreman-proxy-puppet=true
+      - --foreman-proxy-puppet-ssl-ca=/etc/puppetlabs/puppet/ssl/certs/ca.pem
+      - "--foreman-proxy-puppet-ssl-cert=/etc/puppetlabs/puppet/ssl/certs/{{ ansible_fqdn }}.pem"
+      - "--foreman-proxy-puppet-ssl-key=/etc/puppetlabs/puppet/ssl/private_keys/{{ ansible_fqdn }}.pem" 
+      - "--foreman-proxy-puppet-url=https://{{ ansible_fqdn }}:8140"
+
+      - --foreman-proxy-dhcp=true
+      - --foreman-proxy-dhcp-managed=true
+      - --foreman-proxy-dhcp-manage-acls=true
+      - --foreman-proxy-dhcp-config=/etc/dhcp/dhcpd.conf
+      - --foreman-proxy-dhcp-leases=/var/lib/dhcpd/dhcpd.leases
+      - "--foreman-proxy-dhcp-nameservers={{ ansible_dns.nameservers | join(', ') }}"
+      - "--foreman-proxy-dhcp-gateway={{ ansible_default_ipv4.gateway }}"
+      - "--foreman-proxy-dhcp-interface={{ ansible_default_ipv4.interface }}"
+      - "--foreman-proxy-dhcp-option-domain={{ foreman_domain }}"
+    
+      - --foreman-proxy-dns=true
+      - --foreman-proxy-dns-managed=true
+      - "--foreman-proxy-dns-interface={{ ansible_default_ipv4.interface }}"
+      - "--foreman-proxy-dns-forwarders={{ ansible_dns.nameservers | join(';') }}"
+      - "--foreman-proxy-dns-zone={{ foreman_domain }}"
+
+      - --foreman-proxy-ssl=true
+      - --foreman-proxy-ssl-ca=/etc/puppetlabs/puppet/ssl/certs/ca.pem
+      - --foreman-proxy-ssldir=/etc/puppetlabs/puppet/ssl
+      - "--foreman-proxy-ssl-cert=/etc/puppetlabs/puppet/ssl/certs/{{ ansible_fqdn }}.pem"
+      - "--foreman-proxy-ssl-key=/etc/puppetlabs/puppet/ssl/private_keys/{{ ansible_fqdn }}.pem"
+    
+      - --foreman-proxy-tftp=true
+      - --foreman-proxy-tftp-manage-wget=true
+      - --foreman-proxy-tftp-managed=true
+      - --foreman-proxy-tftp-root=/var/lib/tftpboot
+      - "--foreman-proxy-tftp-servername={{ ansible_default_ipv4.address }}"
+  register: cmd
+  changed_when: cmd.rc == 2
+  failed_when: cmd.rc !=0 and cmd.rc !=2
+  tags:
+    - service_foreman_server:installer
+
+- name: "Setup / Settings / Disable OS fact overriding the selected value in provisioning"
+  ansible.builtin.command: 
+    cmd: "hammer settings set --id ignore_facts_for_operatingsystem --value true"
+  register: cmd
+  changed_when: false
+  failed_when: cmd.rc !=0
+- name: "Setup / Settings / Delete Host also destroys VM"
+  ansible.builtin.command: 
+    cmd: "hammer settings set --id destroy_vm_on_host_delete --value true"
+  register: cmd
+  changed_when: false
+  failed_when: cmd.rc !=0
+
+
+- name: "Setup / Server /  Configure Firewall services"
+  ansible.posix.firewalld: 
+    service: "{{ item }}" 
+    state: enabled 
+    permanent: true 
+    immediate: true
+  loop:
+  - dns
+  - dhcp
+  - tftp
+  - http
+  - https
+- name: "Setup / Server / Configure Firewall ports"
+  ansible.posix.firewalld:
+    port: "{{ item }}"
+    state: enabled
+    permanent: true
+    immediate: true
+  loop:
+  - "3000/tcp"
+  - "5910-5930/tcp"
+  - "8140/tcp"
+  - "8443/tcp"

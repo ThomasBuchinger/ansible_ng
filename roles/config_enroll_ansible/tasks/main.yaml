@@ -1,0 +1,10 @@
+---
+- import_tasks: check_vars.yaml
+  tags:
+    - config_enroll_ansible
+    - config_enroll_ansible:check
+
+- import_tasks: enroll.yaml
+  tags:
+    - config_enroll_ansible
+    - config_enroll_ansible:enroll

@@ -1,0 +1,8 @@
+---
+libvirt_bridge: 
+  name: br0
+libvirt_storage:
+  - name: default
+    dir: /var/lib/libvirt/images
+
+

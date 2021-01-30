@@ -1,0 +1,13 @@
+[Unit]
+Description=Perform DDNS Update
+
+[Service]
+Type=oneshot
+RemainAfterExit=false
+ExecStart=bash "{{ work_dir }}/ddns-client/ddns-client.sh"
+
+User={{ ansible_user }}
+CapabilityBoundingSet=
+
+[Install]
+WantedBy=multi-user.target
