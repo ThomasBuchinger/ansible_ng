@@ -8,6 +8,7 @@
     k8s_manifest: "{{ lookup('template', item) }}"
     k8s_app: "{{ item }}"
   loop:
-    - nas-ingress.yaml
-    - internal-ingress.yaml
+    - h5ai-ingress.yaml
+    - truenas-ingress.yaml
+    - syncthing-ingress.yaml
 

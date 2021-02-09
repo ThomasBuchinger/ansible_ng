@@ -10,16 +10,16 @@
   loop:
     - { line: "AddressFamily inet", regex: "AddressFamily" }
     - { line: "Protocol 2", regex: "Protocol" }
-    - { line: "X11Forwarding no", regex: "^X11Forwarding" }
+    - { line: "X11Forwarding {{ sshd_x11_forwarding | ternary('yes', 'no') }}", regex: "^X11Forwarding" }
     - { line: "PermitUserEnvironment no", regex: "PermitUserEnvironment" }
     - { line: "AllowAgentForwarding no", regex: "AllowAgentForwarding" }
     - { line: "AllowTcpForwarding no", regex: "AllowTcpForwarding" }
     - { line: "PermitTunnel no", regex: "PermitTunnel" }
 
-    - { line: "AllowGroups root admins", regex: "AllowGroups" }
+    - { line: "AllowGroups root admins {{ sshd_allow_groups }}", regex: "AllowGroups" }
 
-    - { line: "PermitRootLogin yes", regex: "^PermitRootLogin" }
-    - { line: "PasswordAuthentication no", regex: "^PasswordAuthentication" }
+    - { line: "PermitRootLogin {{ sshd_permit_root_login | ternary('yes', 'no') }}", regex: "^PermitRootLogin" }
+    - { line: "PasswordAuthentication {{ sshd_password_authentication | ternary('yes', 'no') }}", regex: "^PasswordAuthentication" }
     - { line: "PermitEmptyPasswords no", regex: "^#?PermitEmptyPasswords" }
     - { line: "ChallengeResponseAuthentication no", regex: "^ChallengeResponseAuthentication" }
     - { line: "KerberosAuthentication no", regex: "KerberosAuthentication" }
@@ -30,6 +30,6 @@
     content: "{{ item.content }}"
     path: /etc/ssh/sshd_config
   notify: restart_ssh
-  when: nat_server is defined
+  when: sshd_disallow_root_from_host is defined
   loop:
-  - { content: "Match Host {{ nat_server }}\n  PermitRootLogin no" }
+  - { content: "Match Host {{ sshd_disallow_root_from_host }}\n  PermitRootLogin no" }

@@ -3,4 +3,8 @@
   vars:
     ansible_user: root
   roles:
-    - config_enroll_ansible
+    - role: config_enroll_ansible
+      vars:
+        enroll_user: ansible
+        enroll_public_key: "{{ ansible_public_key }}"
+        enroll_home: "{{ work_dir }}"

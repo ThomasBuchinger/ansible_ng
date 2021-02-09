@@ -5,26 +5,6 @@ metadata:
   name: nas
 
 ---
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: nas-ingress-files
-  namespace: nas
-  #annotations:
-  #  nginx.ingress.kubernetes.io/rewrite-target: /files
-spec:
-  rules:
-  - host: nas.{{ ansible_default_ipv4.address }}.nip.io
-    http:
-      paths:
-      - path: /files
-        pathType: Prefix
-        backend:
-          service:
-            name: h5ai
-            port:
-              number: 80
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -44,17 +24,17 @@ spec:
     spec:
       containers:
       - name: h5ai
-        image: joeizzard/h5ai
+        image: awesometic/h5ai
         ports:
         - containerPort: 80
         volumeMounts:
         - name: share
-          mountPath: /container/data/apache/Public/
+          mountPath: /h5ai
           readOnly: true
       volumes:
       - name: share
         hostPath:
-          path: /share/nas
+          path: /share/
           type: Directory
             
 ---

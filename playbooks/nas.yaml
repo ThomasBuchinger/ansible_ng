@@ -1,25 +1,32 @@
 - import_playbook: common_enroll-in-ansible.yaml
-- name: Install NAS Server
-  hosts: berni,labnas
-  vars:
-    k8s_work_dir: "{{ work_dir }}/k8s }}"
+- import_playbook: ddns-updater.yaml
+- name: k3s / Fix-1 / Re-enable Firewalld for ansible run
+  hosts: k3s_nodes
   pre_tasks:
     - name: k3s / Fix-1 / Re-enable Firewalld for ansible run
       systemd:
         name: firewalld
         state: started
+      become: yes 
+
+- name: Configure Base Roles
+  hosts: k3s_nodes
+  vars:
+    k8s_work_dir: "{{ work_dir }}/k8s"
   roles:
     - oasis_roles.system.chrony
     - app_cockpit
+    - role: comp_hosts-file
+      vars:
+        host_file_entries: "{{ static_dns }}"
     - role: comp_sshd
       vars:
-        sshd_admins: 
-          - ansible
+        sshd_admins: "{{ admin_users }}"
     - config_nfs_client
-    - role: nas_h5ai
-      becom: yes
     - nas_k3s
+    - nas_h5ai
+    - nas_syncthing
     - kube_okd-console
-    - kube_ingress_nginx
+    - kube_ingress_traefik
     - nas_ingress
 

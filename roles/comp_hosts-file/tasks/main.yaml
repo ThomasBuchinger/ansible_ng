@@ -1,0 +1,4 @@
+---
+- import_tasks: hosts.yaml
+  tags:
+    - comp_hosts-file

@@ -12,5 +12,5 @@
   command: kubectl wait --for=condition=Available -n ingress-nginx deployment/ingress-nginx-controller
   changed_when: false
   become: yes
-  async: 180
+  async: 300
   poll: 5

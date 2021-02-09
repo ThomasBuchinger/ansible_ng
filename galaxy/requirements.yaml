@@ -1,0 +1,9 @@
+roles:
+  - name: dev-sec.os-hardening
+
+collections:
+  - name: ansible.posix
+  - name: community.general
+  - name: community.libvirt
+  - name: community.crypto
+  - name: oasis_roles.system

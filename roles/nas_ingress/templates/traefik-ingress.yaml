@@ -1,0 +1,26 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: ingress-controller
+#---
+#apiVersion: networking.k8s.io/v1
+#kind: Ingress
+#metadata:
+#  name: traefik-ingress
+#  namespace: ingress-controller
+#  annotations:
+#    traefik.ingress.kubernetes.io/router.middlewares: nas-strip@kubernetescrd
+#spec:
+#  rules:
+#  - host: access.{{ ansible_default_ipv4.address }}.nip.io
+#    http:
+#      paths:
+#      - path: /
+#        pathType: Prefix
+#        backend:
+#          service:
+#            name: traefik-ui
+#            port:
+#              number: 8100
+

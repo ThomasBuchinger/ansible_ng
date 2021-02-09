@@ -1,24 +1,23 @@
 ---
-- name: Share / Prepare Dirs
-  ansible.builtin.file:
-    path: /share/nas/files
-    state: directory
-    owner: "{{ ansible_user }}"
-    group: "{{ ansible_user }}"
-  become: yes
-
-- name: Install / Ensure unzip exists
-  ansible.builtin.package:
-    name: unzip
-    state: present
-  become: yes
-- name: Install / Download h5ai release
-  ansible.builtin.unarchive:
-    #src: https://release.larsjung.de/h5ai/h5ai-0.30.0.zip
-    src: "https://release.larsjung.de/h5ai/h5ai-{{ h5ai_version }}.zip"
-    remote_src: yes
-    dest: /share/nas/files
-
+#- name: Share / Prepare Dirs
+#  ansible.builtin.file:
+#    path: /share/files
+#    state: directory
+#    owner: "{{ ansible_user }}"
+#    group: "{{ ansible_user }}"
+#  become: yes
+#
+#- name: Install / Ensure unzip exists
+#  ansible.builtin.package:
+#    name: unzip
+#    state: present
+#  become: yes
+#- name: Install / Download h5ai release
+#  ansible.builtin.unarchive:
+#    src: "https://release.larsjung.de/h5ai/h5ai-{{ h5ai_version }}.zip"
+#    remote_src: yes
+#    dest: /share/files
+#
 - name: Deploy / NAS Ingress config
   include_role: 
     role: base_kubernetes

@@ -2,23 +2,23 @@
 - name: Check / Download URL
   ansible.builtin.fail:
     msg: "Unable to build download URL: base_url={{ ddns_client_download_url_base }} branch={{ ddns_client_branch }} "
-  when: (ddns_client_download_base_url | length < 1) or
-    (ddns_client_branch | length < 1) or
-    (ddns_client_executeable | length < 1)
+  when: (ddns_client_download_base_url | default('') | length < 1) or
+    (ddns_client_branch | default('') | length < 1) or
+    (ddns_client_executeable | default('') | length < 1)
 
 - name: Check / Mandatory DDNS parameters
   ansible.builtin.fail:
     msg: "Mandatory Parameter not found: Domain: {{ ddns_client_domain }} Hostnames: {{ ddns_client_hostnames }} Provider: {{ ddns_client_provider }}"
-  when: (ddns_client_domain | length < 1) or
-    (ddns_client_hostnames | length < 1) or
-    (ddns_client_provider | length < 1)
+  when: (ddns_client_domain | default('') | length < 1) or
+    (ddns_client_hostnames | default('') | length < 1) or
+    (ddns_client_provider | default('') | length < 1)
 
 - name: Check / Token Auth
   ansible.builtin.fail:
     msg: "Authtype Token: No token found!"
   when: not (
       (ddns_client_authtype == "token") and
-      (ddns_client_token | length > 0)
+      (ddns_client_token | default('') | length > 0)
     )
 
 - name: Check / systemd service

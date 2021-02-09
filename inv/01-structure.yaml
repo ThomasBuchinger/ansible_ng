@@ -2,7 +2,6 @@
 all:
   vars: {}
 
-bastions: {}
 foreman_servers: {}
 kube_nodes:
   children:
@@ -15,6 +14,11 @@ gluster_nodes:
     kube_gluster_config:
 dns_servers: {}
 terraform_nodes: {}
+
+bastions: {}
+external_web: {}
+internal_web: {}
 ddns_updater: {}
-syncthing: {}
+k3s_nodes: {}
+nodered_nodes: {}
 

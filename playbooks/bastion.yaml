@@ -1,0 +1,10 @@
+---
+- name: Configure Bastion Server
+  hosts: bastions
+  roles:
+    - comp_dnf_automatic
+    - role: comp_sshd
+      vars:
+        sshd_x11_forwarding: yes
+        sshd_disallow_root_from_host: 192.168.1.1
+    - app_cockpit

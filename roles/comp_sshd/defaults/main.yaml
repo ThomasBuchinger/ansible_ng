@@ -1,2 +1,6 @@
 ---
 sshd_admins: []
+sshd_x11_forwarding: no
+sshd_allow_groups: ""
+sshd_permit_root_login: yes
+sshd_password_authentication: no

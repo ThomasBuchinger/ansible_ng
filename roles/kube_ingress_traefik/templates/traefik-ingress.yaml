@@ -32,6 +32,7 @@ spec:
       terminationGracePeriodSeconds: 60
       containers:
       - image: traefik:{{ traefik_version }}
+        imagePullPolicy: Always 
         name: traefik-ingress-lb
         ports:
         - name: http

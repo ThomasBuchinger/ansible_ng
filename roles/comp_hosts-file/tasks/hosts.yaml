@@ -1,0 +1,33 @@
+---
+- name: Check / Check host_file_enries
+  ansible.builtin.fail:
+    msg: "Entry not valid: {{ item }}"
+  loop: "{{ host_file_entries }}"
+  when: (item.ip | default('') | length < 1) or
+        ( 
+          (item.name | default('') | length < 1) and 
+          (item.host | default('') | length < 1) and 
+          (item.names | default([]) | length < 1)
+        )
+- name: Edit /etc/hosts
+  ansible.builtin.lineinfile:
+    line: "{{ item.ip }} {{ item.name | default('') }} {{ item.host | default('') }} {{ item.names | default([]) | join(' ') }}"
+    dest: "/etc/hosts"
+  loop: '{{  host_file_entries }}'
+  become: yes
+
+#- name: Combine Entries to /etc/hosts syntax
+#  ansible.builtin.set_fact:
+#    host_file_entries_processed: |-
+#      {% for ip, items in host_file_entries|groupby("ip") -%}
+#      {{ ip }}    {%  for entry in items -%} {{ [(entry.name | default('')) + (entry.host | default(''))  + (entry.names | default([]) | join( " " ))] | join( " "  )}} {% endfor %};
+#      {% endfor -%}
+#
+# TODO: there is an extra linefeed, that messes with lineinfile
+#- name: Edit /etc/hosts
+#  ansible.builtin.lineinfile:
+#    line: "{{ item }}"
+#    dest: "/etc/hosts"
+#  loop: '{{  host_file_entries_processed.split(";")[0:-1] }}'
+#  become: yes
+

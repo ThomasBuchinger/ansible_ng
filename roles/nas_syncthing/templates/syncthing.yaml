@@ -29,17 +29,18 @@ spec:
             - containerPort: 8384
             - containerPort: 22000
               hostPort: 22000
-          volumeMounts:
+          volumeMounts: {% if syncthing_folders|length == 0 %} [] {% endif %}
             {% for share in syncthing_folders %}
             - name: share-{{ share.name }}
               mountPath: /var/syncthing/{{ share.name }}
               readonly: {{ share.readonly | default('false') }}
             {% endfor %}
-    volumes:
+
+      volumes:
       - name: config
         hostPath:
-          path: /share/nas/internal/syncthing
-      {% for share in synthing_folders %}
+          path: /share/files/internal/syncthing
+      {% for share in syncthing_folders %}
       - name: share-{{ share.name }}
         hostPath:
           path: {{ share.path }}
@@ -57,89 +58,6 @@ spec:
   ports:
     - name: http
       port: 8384
----
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: syncthing
-  namespace: syncthing
-  annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /$2
-spec:
-  rules:
-    - host: nas.{{ ansible_default_ipv4.address }}.nip.io
-      http:
-        paths:
-          - path: /(sync/?)($)
-            pathType: Prefix
-            backend:
-              service:
-                name: syncthing
-                port:
-                  number: 8384
-          - path: /(sync)?(rest.*)
-            pathType: Prefix
-            backend:
-              service:
-                name: syncthing
-                port:
-                  number: 8384
-          - path: /(sync)?(syncthing.*)
-            pathType: Prefix
-            backend:
-              service:
-                name: syncthing
-                port:
-                  number: 8384
-          - path: /(sync)?(assets.*)
-            pathType: Prefix
-            backend:
-              service:
-                name: syncthing
-                port:
-                  number: 8384
-          - path: /(sync)?(vendor.*)
-            pathType: Prefix
-            backend:
-              service:
-                name: syncthing
-                port:
-                  number: 8384
-          - path: /(sync)?(qr.*)
-            pathType: Prefix
-            backend:
-              service:
-                name: syncthing
-                port:
-                  number: 8384
-          - path: /(sync)?(theme-assets.*)
-            pathType: Prefix
-            backend:
-              service:
-                name: syncthing
-                port:
-                  number: 8384
-          - path: /(sync)?(meta.js)
-            pathType: Prefix
-            backend:
-              service:
-                name: syncthing
-                port:
-                  number: 8384
-          - path: /(sync)?(modal.html)
-            pathType: Prefix
-            backend:
-              service:
-                name: syncthing
-                port:
-                  number: 8384
-          - path: /(sync)?(themes.json)
-            pathType: Prefix
-            backend:
-              service:
-                name: syncthing
-                port:
-                  number: 8384
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress

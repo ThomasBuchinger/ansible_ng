@@ -6,12 +6,12 @@
     state: present
     comment: "Ansible Automation user"
     create_home: yes
-    home: "{{ work_dir }}"
+    home: "{{ enroll_home }}"
     system: yes
 - name: User / Authorize public key
   ansible.posix.authorized_key:
     user: "{{ enroll_username }}"
-    key: "{{ ansible_public_key }}"
+    key: "{{ enroll_public_key }}"
     state: present
 
 - name: sudo / Ensure sudo is installed

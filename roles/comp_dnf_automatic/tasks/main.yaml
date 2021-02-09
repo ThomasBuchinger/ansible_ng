@@ -1,0 +1,6 @@
+---
+- name: DNF Automatic / Install DNF Automatic
+  ansible.builtin.package:
+    name: dnf-automatic
+    state: present
+  become: yes
