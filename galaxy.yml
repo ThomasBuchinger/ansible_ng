@@ -18,4 +18,9 @@ tags: []
 # L(specifiers,https://python-semanticversion.readthedocs.io/en/latest/#requirement-specification). Multiple version
 # range specifiers can be set and are separated by ','
 dependencies: {}
+  ansible.posix: >0.0.0
+  community.general: >0.0.0
+  community.libvirt: >0.0.0
+  community.crypto: >0.0.0
+  oasis_roles.system: >0.0.0
 
