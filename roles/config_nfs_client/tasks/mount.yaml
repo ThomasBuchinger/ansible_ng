@@ -1,15 +1,15 @@
 ---
-- name: "Mount / creating mount point for share {{ mount.path }}"
+- name: "Mount / creating mount point for share {{ nfs_path }}"
   ansible.builtin.file:
-    path: "{{ mount.path }}"
+    path: "{{ nfs_path }}"
     state: directory
   become: yes
 
-- name: "Mount / Mount NFS share {{ mount.path }} from {{ mount.server }}:/{{ mount.remote_path }}"
+- name: "Mount / Mount NFS share {{ nfs_path }} from {{ nfs_server }}:/{{ nfs_share_name }}"
   ansible.posix.mount:
-    name: "{{ mount.path }}"
-    src: "{{ mount.server }}:/{{ mount.remote_path }}"
+    name: "{{ nfs_path }}"
+    src: "{{ nfs_server }}:/{{ nfs_share_name }}"
     fstype: nfs
-    opts: "{{ mount.opts | default(omit) }}"
+    opts: "{{ nfs_mount_opts | default(omit) }}"
     state: mounted
   become: yes

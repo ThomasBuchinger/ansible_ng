@@ -11,9 +11,6 @@
     - config_nfs_client
 
 - include_tasks: mount.yaml
-  loop: "{{ nfs_mounts | default([]) }}"
-  loop_control:
-    loop_var: mount
   tags:
     - config_nfs_client
     - config_nfs_client:mount
