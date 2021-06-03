@@ -1,7 +1,0 @@
----
-ddns_client_domain: "{{ my_ddns_domain }}"
-ddns_client_hostnames: "{{ my_ddns_hostnames }}"
-ddns_client_query: "{{ my_ddns_query_host }}"
-ddns_client_provider: cloudflare
-ddns_client_authtype: token
-ddns_client_token: "{{ my_cloudflare_token }}"

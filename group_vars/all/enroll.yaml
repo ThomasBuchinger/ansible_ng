@@ -1,3 +1,0 @@
-var_enroll_home: "{{ my_work_dir }}"
-var_enroll_public_key: "{{ my_ansible_public_key }}"
-
