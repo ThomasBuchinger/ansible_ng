@@ -1,0 +1,2 @@
+nfs_mounts: "{{ my_nfs_mounts }}"
+vdo_devices: "{{ my_vdo_devices }}"

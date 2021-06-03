@@ -6,5 +6,5 @@
     - role: config_enroll_ansible
       vars:
         enroll_user: ansible
-        enroll_public_key: "{{ ansible_public_key }}"
-        enroll_home: "{{ work_dir }}"
+        enroll_public_key: "{{ var_enroll_public_key }}"
+        enroll_home: "{{ var_enroll_home }}"

@@ -1,5 +1,0 @@
-- name: Syncthing / Create conf directory
-  ansible.builtin.file:
-    path: "{{ syncthing_homedir }}/.conf/syncthing"
-    state: directory
-  notify: restart_syncthing

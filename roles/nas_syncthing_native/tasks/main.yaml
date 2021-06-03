@@ -1,6 +1,0 @@
-- import_tasks: check.yaml
-- import_tasks: user.yaml
-  become: yes
-- import_tasks: install.yaml
-  become: yes
-

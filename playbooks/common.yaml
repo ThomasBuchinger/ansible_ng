@@ -10,11 +10,11 @@
         nfs_share_name: "{{ item.name }}"
         nfs_path: "{{ item.path }}"
         nfs_mount_opts: "{{ item.opts }}"
-      loop: "{{ nfs_mounts }}"
+      loop: "{{ var_nfs_mounts }}"
     - include_role:
         name: comp_vdo
       vars:
         vdo_name: "{{ item.vdo_name }}"
         dev_name: "{{ item.dev_name }}"
         vdo_lv_size: "{{ item.vdo_size }}"
-      loop: "{{ vdo_devices }}"
+      loop: "{{ var_vdo_devices }}"
