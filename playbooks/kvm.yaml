@@ -2,5 +2,6 @@
 - name: Install KVM Hypervisors
   hosts: kvm_hypervisors
   roles:
-    - comp_terraform
+    - thomasbuchinger.common.lang_terraform
+    - thomasbuchinger.common.svc_libvirt_images
     - service_kvm

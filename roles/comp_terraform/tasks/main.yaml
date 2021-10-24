@@ -1,8 +1,0 @@
----
-- import_tasks: check.yaml
-  tags:
-    - app_terraform
-    - app_terraform:check
-- import_tasks: terraform.yaml
-  tags:
-    - app_terraform

@@ -2,6 +2,8 @@ roles:
   - name: dev-sec.os-hardening
 
 collections:
+  - type: git
+    name: https://github.com/thomasbuchinger/ansible_common.git
   - name: ansible.posix
   - name: community.general
   - name: community.libvirt

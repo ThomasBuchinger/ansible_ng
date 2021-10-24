@@ -10,9 +10,9 @@
   tags:
     - service_kvm
     - service_kvm:network
-- include_tasks: 
+- include_tasks:
     file: import_storage.yml
-  loop_control: 
+  loop_control:
     loop_var: pool
   loop: "{{ libvirt_storage }}"
   tags:

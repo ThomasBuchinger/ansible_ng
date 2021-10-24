@@ -1,6 +1,12 @@
 ---
+- name: Check / Is enroll_user
+  amsible.builtin.assert:
+    that:
+      - enroll_user | length > 1
+  fail_msg: enroll_user variable not set
 - name: Check / Is Ansible Public-Key set?
-  fail:
-    msg: No Public Key found
-  when: enroll_public_key | length < 1
+  ansible.builtin.assert:
+    that:
+      - enroll_public_key | length > 1
+    fail_msg: No Public Key found
 

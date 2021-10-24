@@ -1,3 +1,0 @@
-- import_tasks: install.yaml
-  tags:
-    - app_cockpit:install

@@ -12,7 +12,7 @@
   ansible.builtin.template:
     src: networking_ifcfg-br0.j2
     dest: "/etc/sysconfig/network-scripts/ifcfg-{{ libvirt_bridge.name }}"
-    backup: no  
+    backup: no
   when: ansible_default_ipv4.interface != libvirt_bridge.name
   notify: restart_network
   become: yes

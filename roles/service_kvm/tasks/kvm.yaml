@@ -5,7 +5,7 @@
       - qemu-kvm
       - libvirt
       - virt-install
-      - libguestfs-tools 
+      - libguestfs-tools
     state: present
   become: yes
 - name: "Install / RHEL 7 python bindings"
@@ -20,7 +20,7 @@
   ansible.builtin.yum:
     name:
       - python3-libvirt
-      - python3-lxml 
+      - python3-lxml
     state: present
   become: yes
   when: ansible_distribution_major_version == '8'

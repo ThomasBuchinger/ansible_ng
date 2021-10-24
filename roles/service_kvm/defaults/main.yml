@@ -1,5 +1,5 @@
 ---
-libvirt_bridge: 
+libvirt_bridge:
   name: br0
 libvirt_storage:
   - name: default
