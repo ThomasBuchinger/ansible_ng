@@ -14,3 +14,12 @@
     state: present
     comment: "{{ key_exchange_comment }}"
   register: keys
+
+- name: keygen / SElinux / run restorecon
+  command: restorecon {{ item }}
+  loop:
+    - "{{ key_exchange_path }}/{{ key_exchange_key_name }}"
+    - "{{ key_exchange_path }}/{{ key_exchange_key_name }}.pub"
+  when:
+    - ansible_selinux.status == "enabled"
+    - keys.changed

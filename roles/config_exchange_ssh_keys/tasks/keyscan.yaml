@@ -1,7 +1,7 @@
 ---
 # Add the public keys from other hosts to known_hosts
 - name: keyscan / Perform keyscan
-  ansible.builtin.command: 
+  ansible.builtin.command:
     cmd: "ssh-keyscan -t rsa,ecdsa,ed25519 {{ item }}"
   register: keyscan
   changed_when: false
@@ -18,6 +18,11 @@
     owner: "{{ key_exchange_user }}"
     group: "{{ key_exchange_user }}"
   when: not known_hosts.stat.exists
+- name: keyscan / SElinux / Run restorecon
+  ansible.builtin.command: "restorecon {{ key_exchange_path }}/{{ key_exchange_known_hosts_file }}"
+  when:
+    - ansible_selinux.status == "enabled"
+    - not known_hosts.stat.exists
 - name: keyscan / Add scanned keys to known_hosts
   ansible.builtin.lineinfile:
     regexp: "{{ item | regex_replace('^([^\\s]+) (ssh-[_\\-\\w]+)', '\\1 \\2') | regex_escape() }}"

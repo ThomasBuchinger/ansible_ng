@@ -1,23 +1,27 @@
 ---
 - name: Check / Mandatory variables
-  ansible.builtin.fail:
-    msg: "Missing mandatory parameter: key_exchange_user={{ key_exchange_user }} "
-  when: key_exchange_user | default('') | length < 1
+  ansible.builtin.assert:
+    that:
+      - key_exchange_user is defined
+      - key_exchange_user | length > 1
+    fail_msg: "Missing mandatory parameter: key_exchange_user={{ key_exchange_user }}"
 
 - name: Discover / Available users
-  ansible.builtin.command: 
+  ansible.builtin.command:
     cmd: "cut -d : -f 1 /etc/passwd"
   register: available_users
   changed_when: false
 - name: Check / key_exchange_user exists
-  ansible.builtin.fail:
-    msg: "{{ key_exchange_user }} does not exist"
-  when: not ( key_exchange_user in available_users.stdout )
+  ansible.builtin.assert:
+    that:
+      - key_exchange_user in available_users.stdout
+    fail_msg: "{{ key_exchange_user }} does not exist"
 
 - name: Check / authorized_keys task requires generate_keys task
-  ansible.builtin.fail:
-    msg: "Cannot perform 'authorize keys' without generating keys first! (You can manually generate keys first though)"
-  when: key_exchange_authorized_keys == true and key_exchange_generate_keys == false
+  ansible.builtin.assert:
+    that:
+      - not( key_exchange_authorized_keys == true and key_exchange_generate_keys == false )
+    fail_msg: "Cannot perform 'authorize keys' without generating keys first! (You can manually generate keys first though)"
 
 - name: "Summary:"
   ansible.builtin.debug:
