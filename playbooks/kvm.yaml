@@ -3,5 +3,5 @@
   hosts: kvm_hypervisors
   roles:
     - thomasbuchinger.common.lang_terraform
-    - thomasbuchinger.common.svc_libvirt_images
+    - thomasbuchinger.common.svc_libvirt_image
     - service_kvm
