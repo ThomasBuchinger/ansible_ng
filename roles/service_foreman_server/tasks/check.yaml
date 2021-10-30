@@ -1,57 +1,88 @@
 ---
-- name: Check / Check variables
-  ansible.builtin.fail:
-    msg: "Mandatory parameter not found! hostname={{ foreman_host }} domain={{ foreman_domain }} work_dir={{ foreman_work_dir }} password={{ foreman_admin_password }}"
-  when: (foreman_hostname | default('') | length < 1 ) or
-    (foreman_domain | default('') | length < 1 ) or
-    (foreman_work_dir | default('') | length < 1 ) or
-    (foreman_admin_password | default('') | length < 1 )
+- name: Check / Check hostname = {{ foreman_hostname }}
+  ansible.builtin.assert:
+    that:
+      - foreman_hostname is defined
+      - foreman_hostname | length > 1
+    fail_msg: "foreman_hostanem variable not set"
+- name: Check / Check domain = {{ foreman_domain }}
+  ansible.builtin.assert:
+    that:
+      - foreman_domain is defined
+      - foreman_domain | length > 1
+    fail_msg: "foreman_domain variable not set"
+- name: Check / Check work_dir = {{ foreman_work_dir }}
+  ansible.builtin.assert:
+    that:
+      - foreman_work_dir is defined
+      - foreman_work_dir | length > 1
+    fail_msg: foreman_work_dir variable not set
+
+- name: Check / Check admin password
+  ansible.builtin.assert:
+    that:
+      - foreman_admin_password is defined
+      - foreman_admin_password | length > 1
+    fail_msg: foreman_admin_password variable not set
+
 - name: Check / Allow only rhel distributions
-  ansible.builtin.fail:
-    msg: Role assumes Red Hat family of distributions. Mostly because of Repos
-  when: ansible_os_family == "Red Hat"
+  ansible.builtin.assert:
+    that:
+      - ansible_os_family == "RedHat"
+    fail_msg: Role assumes Red Hat family of distributions. Mostly because of Repos
 
 - name: Check / Compute / KVM compute resources
-  ansible.builtin.fail:
-    msg: "Compute Resource {{ res.name }} missing attribute: url={{ res.url }}"
+  ansible.builtin.assert:
+    that:
+      - res.name is defined
+      - res.name | length > 1
+      - res.url is defined
+      - res.url | length > 1
+    success_msg: "Adding Compute Resource {{ res.name }}"
+    fail_msg: "Compute Resource {{ res.name }} missing attribute: url={{ res.url }}"
   when:
-    - (res.type | default('') | length < 1 ) or
-      (res.name | default('') | length < 1 ) or
-      (res.url | default('') | length < 1 )
     - "res.type == 'kvm'"
   loop: "{{ foreman_compute }}"
   loop_control:
     loop_var: res
 
 - name: Check / Compute / VMware compute resources
-  ansible.builtin.fail:
-    msg: "Compute Resource {{ res.name }} missing attribute: {{ res }}"
+  ansible.builtin.assert:
+    that:
+      - res.datacenter is defined
+      - res.datacenter | length > 1
+      - res.server is defined
+      - res.server | length > 1
+      - res.user is defined
+      - res.user | length > 1
+      - res.password is defined
+      - res.password | length > 1
+    success_msg: Validated Compute Resource {{ res.name }} via {{ res.server }}
+    fail_msg: "Compute Resource {{ res.name }} missing attribute: {{ res }}"
   when:
-    - (res.type | default('') | length < 1 ) or
-      (res.name | default('') | length < 1 ) or
-      (res.datacenter | default('') | length < 1 ) or
-      (res.server | default('') | length < 1 ) or
-      (res.user | default('') | length < 1 ) or
-      (res.password | default('') | length < 1 )
     - "res.type == 'vmware'"
   loop: "{{ foreman_compute }}"
   loop_control:
     loop_var: res
 
 - name: Check / Network variables
-  ansible.builtin.fail:
-    msg: "Invalid Network {{ n.name }}: {{ n }}"
-  when: (n.name | default('') | length < 1 ) or
-    (n.networkid | default('') | length < 1 ) or
-    (n.dns1 | default('') | length < 1 ) or
-    (n.dns2 | default('') | length < 1 ) or
-    (n.gateway | default('') | length < 1 ) or
-    (n.hoststart | default('') | length < 1 ) or
-    (n.hostend | default('') | length < 1 )
+  ansible.builtin.assert:
+    that:
+      - n.name | default('') | length > 1
+      - n.networkid | default('') | length > 1
+      - n.dns1 | default('') | length > 1
+      - n.dns2 | default('') | length > 1
+      - n.gateway | default('') | length > 1
+      - n.hoststart | default('') | length > 1
+      - n.hostend | default('') | length > 1
+    success_msg: Validated Network {{ n.name }}
+    fail_msg: "Invalid Network {{ n.name }}: {{ n }}"
   loop: "{{ foreman_networks }}"
   loop_control:
     loop_var: n
-- debug:
+
+- name: Check / Print Compute Profiles
+  debug:
     msg: "{{ name }} /  {{ cpus }} / {{ mem }} / {{ volume }} / {{ iface }} ||| {{ ifaced }} {{ ifacek }} {{ ifacev }}"
   vars:
       name: "{{ (p.name | default('') | length < 1 ) }}"
@@ -66,21 +97,28 @@
   loop_control:
     loop_var: p
 - name: Check / Compute Profiles
-  ansible.builtin.fail:
-    msg: "Invalid Compute Profile {{ p.name }}: {{ p }}"
-  when: (p.name | default('') | length < 1 ) or
-      (p.cpus | int(-1) < 0 ) or
-      (p.memory is number and p.memory < 0 ) or
-      ((p.adv_kvm_volume | default('') | length < 1 ) and (p.adv_vmware_volume | default('') | length < 1 ) and ((p.size | int(-1) < 0 ) or (p.storage_location | default('') | length < 1 ))) or
-      ((p.adv_kvm_interface | default('') | length < 1 ) and (p.adv_vmware_interface | default('') | length < 1) and ( p.network | default('') | length < 1 ))
+  ansible.builtin.assert:
+    that:
+      - p.name | default('') | length > 1
+      - p.cpus | int(-1) > 0
+      - p.memory is number and p.memory > 0
+      # not( ( no kvm storage config                     ) and ( no vmware storage config                     ) and ( ( no general size and location config                                   ) ) )
+      - not( (p.adv_kvm_volume | default('') | length < 1) and (p.adv_vmware_volume | default('') | length < 1) and ( (p.size | int(-1) < 0) or (p.storage_location | default('') | length < 1) ) )
+      # not( ( no kvm network config                        ) and ( no vmware network config                        ) and ( no general network config          ) )
+      - not( (p.adv_kvm_interface | default('') | length < 1) and (p.adv_vmware_interface | default('') | length < 1) and (p.network | default('') | length < 1) )
+    success_msg: Validated compute profile {{ p.name }}
+    fail_msg: "Compute Profile {{ p.name }} invalid: {{ p }}"
   loop: "{{ foreman_flavors }}"
   loop_control:
     loop_var: p
 
 - name: Check / Hostgroups
-  ansible.builtin.fail:
-    msg: "Invalid Hostgroup {{ h.name }}: {{ h }}"
-  when: (h.name | default('') | length < 1 ) 
+  ansible.builtin.assert:
+    that:
+      - h.name is defined
+      - h.name | length > 1
+    success_msg: Validated Hostgroup {{ h.name }}
+    fail_msg: "Invalid Hostgroup {{ h.name }}: {{ h }}"
   loop: "{{ foreman_groups }}"
   loop_control:
     loop_var: h

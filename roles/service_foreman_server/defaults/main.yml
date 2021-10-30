@@ -12,7 +12,7 @@ foreman_admin_email: "{{ ansible_user }}@{{ ansible_fqdn }}"
 foreman_key_name: id_rsa
 
 foreman_python: python38:3.8
-foreman_ruby: ruby:2.5
+foreman_ruby: ruby:2.7
 
 #foreman_default_net_ns: "{{ dns_ip }}"
 #foreman_default_net_forwarders: "{{ dns_server }}"

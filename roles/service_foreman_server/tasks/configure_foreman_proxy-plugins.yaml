@@ -6,7 +6,7 @@
       - --detailed-exitcodes
       - --no-colors
       - --verbose-log-level=warn
-      - --enable-foreman-proxy  
+      - --enable-foreman-proxy
       - --foreman-proxy-register-in-foreman=true
       - "--foreman-proxy-registered-name={{ ansible_fqdn }}"
 

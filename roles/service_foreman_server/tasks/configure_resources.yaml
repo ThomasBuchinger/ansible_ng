@@ -35,9 +35,9 @@
 - import_tasks: import_create_os.yaml
 
 - name: "Configure / Create Environment: production"
-  command: "python3 ./hammer.py environment create --name {{ item }}"
+  command: "python3 ./hammer.py puppet-environment create --name {{ item }}"
   args:
-    chdir: "{{ work_dir }}/service_foreman_server"
+    chdir: "{{ foreman_work_dir }}"
   register: cmd
   failed_when: cmd.rc >= 2
   changed_when: cmd.rc == 1

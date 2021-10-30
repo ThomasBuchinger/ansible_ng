@@ -2,10 +2,11 @@
 - name: "Compute / VMware / Create vCenter compute resource"
   command: "python ./hammer.py compute-resource create --name {{ vmware_compute.name }} --datacenter {{ vmware_compute.datacenter }} --provider vmware --server {{ vmware_compute.server }} --user {{ vmware_compute.user }} --password {{ vmware_compute.password }} --url invalid"
   args:
-    chdir: "{{ foreman_work_dir }}/service_foreman_server"
+    chdir: "{{ foreman_work_dir }}"
   register: cmd
   failed_when: cmd.rc >= 2
   changed_when: cmd.rc == 1
+  become: yes
 
 - name: "Compute / Set default compute resource {{ vmware_compute.name }}"
   set_fact:

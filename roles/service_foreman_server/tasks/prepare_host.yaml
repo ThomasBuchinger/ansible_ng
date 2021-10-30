@@ -55,7 +55,7 @@
     src: "{{ item }}"
     dest: "{{ foreman_work_dir }}/{{ item }}"
     mode: 755
-  loop: 
+  loop:
   - "hammer.py"
   - "post-config-os.py"
 

@@ -34,10 +34,11 @@
         create_home: yes
       become: yes
   roles:
+    - role: thomasbuchinger.common.os_centosstream
     - role: config_copy_ssh_key
       vars:
-        copy_ssh_private_key: "{{ ansible_private_key }}"
-        copy_ssh_public_key: "{{ ansible_public_key }}"
+        copy_ssh_private_key: "{{ my_ansible_private_key }}"
+        copy_ssh_public_key: "{{ my_ansible_public_key }}"
         copy_ssh_key_name: ansible_key
         copy_ssh_path: /usr/share/foreman-proxy/.ssh
         copy_ssh_user: foreman-proxy
@@ -45,11 +46,13 @@
       become: yes
     - role: service_foreman_server
       vars:
-        foreman_version: 2.2
+        foreman_version: 3.0
+        foreman_admin_password: "{{ my_foreman_admin_password }}"
+        foreman_hostname: "{{ ansible_hostname }}"
         foreman_domain: "{{ dns_domain }}"
-        foreman_work_dir: "{{ work_dir }}/service_foreman"
+        foreman_work_dir: "{{ my_work_dir }}/service_foreman"
         foreman_key_name: ansible_key
-        foreman_default_net_dns_forwarders: 
-          - 8.8.8.8
+        foreman_default_net_dns_forwarders:
+          - "{{ dns_ip }}"
           - 1.1.1.1
       become: yes

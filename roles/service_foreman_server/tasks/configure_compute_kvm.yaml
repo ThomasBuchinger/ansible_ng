@@ -2,10 +2,11 @@
 - name: "Compute / KVM / Create KVM compute resource"
   command: "python3 ./hammer.py compute-resource create --name {{ kvm_compute.name }} --provider libvirt --url {{ kvm_compute.url }} --display-type {{ kvm_compute.console_type | default('VNC') }} --set-console-password {{ kvm_compute.set_console_passwd | default('no') }}"
   args:
-    chdir: "{{ foreman_work_dir }}/service_foreman_server"
+    chdir: "{{ foreman_work_dir }}"
   register: cmd
   failed_when: cmd.rc >= 2
   changed_when: cmd.rc == 1
+  become: yes
 
 - name: "Compute / Set default compute resource {{ kvm_compute.name }}"
   set_fact:

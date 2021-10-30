@@ -25,7 +25,7 @@
   loop: "{{ foreman_compute }}"
   loop_control:
     loop_var: "vmware_compute"
-  when: 
+  when:
     - vmware_compute.type == "vmware"
     - foreman_skip_compute_vmware != true
   tags:
@@ -36,7 +36,7 @@
   loop: "{{ foreman_compute }}"
   loop_control:
     loop_var: "kvm_compute"
-  when: 
+  when:
     - kvm_compute.type == "kvm"
     - foreman_skip_compute_kvm != true
   tags:
@@ -44,6 +44,7 @@
     - service_foreman_server:kvm
 
 - import_tasks: configure_resources.yaml
+  become: yes
 
 #- import_tasks: configure_ansible.yaml
 #- import_tasks: fix_tftpboot.yaml

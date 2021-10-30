@@ -43,3 +43,20 @@
   failed_when: cmd.rc >= 2
   changed_when: cmd.rc == 1
 
+
+- name: "Configure / OS / Create OS: CentOS 8 Stream"
+  command: "python3 ./hammer.py os create --name 'Centos8stream' --architectures 'x86_64' --description 'Centos8stream' --family 'Redhat' --major 8 --media 'CentOS Stream' --password-hash SHA512"
+  args:
+    chdir: "{{ foreman_work_dir }}"
+  register: os_cmd
+  failed_when: os_cmd.rc >= 2
+  changed_when: os_cmd.rc == 1
+- name: "Configure / OS / Configure OS: CentOS 8 Stream"
+  command: "python3 ./post-config-os.py --os 'Centos8stream' --provision 'Kickstart default' --pxe 'Kickstart default PXELinux' --partition {{ lookup('fileglob', 'partition-rhel*.cfg').split(',') | map('basename') | join(' ') }}"
+  args:
+    chdir: "{{ foreman_work_dir }}"
+  when: os_cmd.changed
+  register: cmd
+  failed_when: cmd.rc >= 2
+  changed_when: cmd.rc == 1
+
